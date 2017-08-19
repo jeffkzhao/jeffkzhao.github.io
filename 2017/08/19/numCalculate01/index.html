@@ -6,16 +6,20 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="jeffkzhao.github.io">
-  <title>标签 | blog</title>
+  <title>数值计算需要注意的问题 | blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="标签">
-<meta property="og:url" content="jeffkzhao.github.io/tags/index.html">
+  <meta name="description" content="机器学习需要大量数值计算，通过迭代地更新解来解决数学问题的算法，常见的操作包括优化(找到最小化或最大化函数值的参数)和线性方程组的求解。 Overflow and Underflow上溢和下溢数字计算机无法对实数进行”精确”表示,总会引入些误差（大部分是舍入误差rounding errors）。当这些误差被复合累积操作时，会造成一些问题。 误差的下溢 ： 接近零的的数被四舍五入为零。很多时候等于零">
+<meta name="keywords" content="数值计算,overflow &amp; underflow,poor conditioning">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数值计算需要注意的问题">
+<meta property="og:url" content="jeffkzhao.github.io/2017/08/19/numCalculate01/index.html">
 <meta property="og:site_name" content="blog">
+<meta property="og:description" content="机器学习需要大量数值计算，通过迭代地更新解来解决数学问题的算法，常见的操作包括优化(找到最小化或最大化函数值的参数)和线性方程组的求解。 Overflow and Underflow上溢和下溢数字计算机无法对实数进行”精确”表示,总会引入些误差（大部分是舍入误差rounding errors）。当这些误差被复合累积操作时，会造成一些问题。 误差的下溢 ： 接近零的的数被四舍五入为零。很多时候等于零">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-08-19T08:46:10.000Z">
+<meta property="og:updated_time" content="2017-08-19T02:27:17.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="标签">
+<meta name="twitter:title" content="数值计算需要注意的问题">
+<meta name="twitter:description" content="机器学习需要大量数值计算，通过迭代地更新解来解决数学问题的算法，常见的操作包括优化(找到最小化或最大化函数值的参数)和线性方程组的求解。 Overflow and Underflow上溢和下溢数字计算机无法对实数进行”精确”表示,总会引入些误差（大部分是舍入误差rounding errors）。当这些误差被复合累积操作时，会造成一些问题。 误差的下溢 ： 接近零的的数被四舍五入为零。很多时候等于零">
   
     <link rel="alternative" href="/atom.xml" title="blog" type="application/atom+xml">
   
@@ -165,27 +169,44 @@ var _hmt = _hmt || [];
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="tags-" class="article article-type-tags " itemscope itemprop="blogPost">
+            <article id="post-numCalculate01" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      标签
+      数值计算需要注意的问题
     </h1>
   
 
         
-        <a href="/tags/index.html" class="archive-article-date">
-  	<time datetime="2017-08-19T08:46:10.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-19</time>
+        <a href="/2017/08/19/numCalculate01/" class="archive-article-date">
+  	<time datetime="2017-08-19T01:56:55.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-19</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <p>机器学习需要大量数值计算，通过<strong>迭代地更新</strong>解来解决数学问题的算法，常见的操作包括<strong>优化(找到最小化或最大化函数值的参数)和线性方程组的求解</strong>。</p>
+<h2 id="Overflow-and-Underflow上溢和下溢"><a href="#Overflow-and-Underflow上溢和下溢" class="headerlink" title="Overflow and Underflow上溢和下溢"></a>Overflow and Underflow上溢和下溢</h2><p>数字计算机无法对实数进行”精确”表示,总会引入些误差（大部分是<strong>舍入误差rounding errors</strong>）。当这些误差被复合累积操作时，会造成一些问题。</p>
+<p>误差的<strong>下溢</strong> ： 接近零的的数被四舍五入为零。很多时候等于零与接近零的表现质的不同。<br><strong>上溢</strong>：当大量级的数被近似为$\infty, -\infty$,进一步计算会导致非数字。<br>在softmax函数，经常用于预测与multinoulli 分布相关联的概率，定义为：<br></p>
+<p>考虑所有x都等于c，那么softmax的理论值为1/n。但是在数值计算中，当c量级很大时，可能求不到：</p>
+<ul>
+<li>If c is very negative, $\exp (c)$会underflow：造成分母为0。</li>
+<li>c是一个很大数，造成$\exp (c)$overflow；</li>
+</ul>
+<p>通过计算$\mathrm{softmax} (\boldsymbol{z})$来避免，其中 $\boldsymbol{z = x} - \max _i x_i$ :</p>
+<ul>
+<li>减去$\max _i x_i$导致exp最大参数为0；不会overflow；</li>
+<li>同样的愿意，分布至少有一个值为1，排除分母underflow变成被0除的可能。</li>
+</ul>
+<p>另外分子的underflow可导致整体结果为零。若在计算log softmax(x) 函数中，先计算softmax，再代入计算log有可能出现负无穷结果。所以我们要实现一个单独的函数以数值稳定的方式来计算。</p>
+<p><strong>所以计算时一定要考虑数值不稳定的问题，必须设计为最小化舍入误差的积累</strong>。</p>
+<h2 id="病态条件数Poor-Conditioning"><a href="#病态条件数Poor-Conditioning" class="headerlink" title="病态条件数Poor Conditioning"></a>病态条件数Poor Conditioning</h2><p><strong>条件数conditioning是指函数相对于输入的微小变化而变化的快慢程度</strong>，而迅速变化的函数是不理想的：舍入误差会造成很大的变化。</p>
+<p>考虑函数$f(x) = A^{-1} x$, 当$A \in \mathbb{R}^{n \times n}$具有特征分解时，其条件数为：<br>$$\underset{i,j}{\max}~ \Bigg| \frac{\lambda_i}{ \lambda_j} \Bigg|.$$<br>这是最大和最小特征值的模之比,当该数很大时，矩阵求逆对输入的误差特别敏感。<br>注意这种敏感性是矩阵本身的固有特性，而不是矩阵求逆期间舍入误差的结果。 即使我们乘以完全正确的矩阵逆，病态条件的矩阵也会放大预先存在的误差。 在实践中，该错误将与求逆过程本身的数值误差进一步复合。</p>
+
       
 
       
@@ -224,7 +245,37 @@ var _hmt = _hmt || [];
     <div class="article-info article-info-index">
       
       
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">数值计算</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">overflow & underflow</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">poor conditioning</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
       
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/math/" class="article-tag-list-link color5">math</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
 
       
 
@@ -274,7 +325,7 @@ var _hmt = _hmt || [];
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="http://s.jiathis.com/qrcode.php?url=http:jeffkzhao.github.io/tags/" alt="微信分享二维码">
+      <img src="http://s.jiathis.com/qrcode.php?url=http:jeffkzhao.github.io/2017/08/19/numCalculate01/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -286,6 +337,16 @@ var _hmt = _hmt || [];
 </article>
 
   
+<nav id="article-nav">
+  
+  
+    <a href="/2017/08/18/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Hello World</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
 
 <aside class="wrap-side-operation">
     <div class="mod-side-operation">
@@ -307,7 +368,7 @@ var _hmt = _hmt || [];
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    目录，不存在的…
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Overflow-and-Underflow上溢和下溢"><span class="toc-number">1.</span> <span class="toc-text">Overflow and Underflow上溢和下溢</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#病态条件数Poor-Conditioning"><span class="toc-number">2.</span> <span class="toc-text">病态条件数Poor Conditioning</span></a></li></ol>
                     </div>
                 </span>
             </div>
@@ -363,7 +424,7 @@ var _hmt = _hmt || [];
 	var yiliaConfig = {
 		mathjax: true,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
 		isTag: false,
 		isCategory: false,

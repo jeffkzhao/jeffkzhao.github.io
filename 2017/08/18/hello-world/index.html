@@ -53,7 +53,7 @@ var _hmt = _hmt || [];
     <canvas id="anm-canvas" class="anm-canvas"></canvas>
     <div class="left-col" q-class="show:isShow">
       
-<div class="overlay" style="background: #BBFFFF"></div>
+<div class="overlay" style="background: #E0E0E0"></div>
 <div class="intrude-less">
 	<header id="header" class="inner">
 		<a href="/" class="profilepic">
@@ -108,7 +108,7 @@ var _hmt = _hmt || [];
     <div class="mid-col" q-class="show:isShow,hide:isShow|isFalse">
       
 <nav id="mobile-nav">
-  	<div class="overlay js-overlay" style="background: #BBFFFF"></div>
+  	<div class="overlay js-overlay" style="background: #E0E0E0"></div>
 	<div class="btnctn js-mobile-btnctn">
   		<div class="slider-trigger list" q-on="click: openSlider(e)"><i class="icon icon-sort"></i></div>
 	</div>
@@ -298,6 +298,20 @@ var _hmt = _hmt || [];
 </article>
 
   
+<nav id="article-nav">
+  
+    <a href="/2017/08/19/numCalculate01/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          数值计算需要注意的问题
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
 
 <aside class="wrap-side-operation">
     <div class="mod-side-operation">
@@ -464,6 +478,18 @@ MathJax.Hub.Queue(function() {
             <input type="checkbox" q-on="click:toggleTag(e)" q-attr="checked:showTags">
           </label>
           <ul class="article-tag-list" q-show="showTags">
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">数值计算</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">overflow & underflow</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">poor conditioning</a>
+              </li>
             
             <div class="clearfix"></div>
           </ul>
