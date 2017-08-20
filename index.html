@@ -65,10 +65,6 @@ var _hmt = _hmt || [];
 			
 				<li><a href="/">主页</a></li>
 	        
-				<li><a href="/categories">分类</a></li>
-	        
-				<li><a href="/tags">标签</a></li>
-	        
 				<li><a href="/archives">归档</a></li>
 	        
 			</ul>
@@ -123,10 +119,6 @@ var _hmt = _hmt || [];
 			
 				
 			
-				
-			
-				
-			
 			
 			
 			<nav class="header-nav">
@@ -140,16 +132,12 @@ var _hmt = _hmt || [];
 			</nav>
 
 			<nav class="header-menu js-header-menu">
-				<ul style="width: 70%">
+				<ul style="width: 50%">
 				
 				
-					<li style="width: 25%"><a href="/">主页</a></li>
+					<li style="width: 50%"><a href="/">主页</a></li>
 		        
-					<li style="width: 25%"><a href="/categories">分类</a></li>
-		        
-					<li style="width: 25%"><a href="/tags">标签</a></li>
-		        
-					<li style="width: 25%"><a href="/archives">归档</a></li>
+					<li style="width: 50%"><a href="/archives">归档</a></li>
 		        
 				</ul>
 			</nav>
@@ -186,20 +174,20 @@ var _hmt = _hmt || [];
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>机器学习需要大量数值计算，通过<strong>迭代地更新</strong>解来解决数学问题的算法，常见的操作包括<strong>优化(找到最小化或最大化函数值的参数)和线性方程组的求解</strong>。</p>
+        <p>数值计算中，需要考虑计算机精度带来的一些问题。</p>
 <h2 id="Overflow-and-Underflow上溢和下溢"><a href="#Overflow-and-Underflow上溢和下溢" class="headerlink" title="Overflow and Underflow上溢和下溢"></a>Overflow and Underflow上溢和下溢</h2><p>数字计算机无法对实数进行”精确”表示,总会引入些误差（大部分是<strong>舍入误差rounding errors</strong>）。当这些误差被复合累积操作时，会造成一些问题。</p>
-<p>误差的<strong>下溢</strong> ： 接近零的的数被四舍五入为零。很多时候等于零与接近零的表现质的不同。<br><strong>上溢</strong>：当大量级的数被近似为$\infty, -\infty$,进一步计算会导致非数字。<br>在softmax函数，经常用于预测与multinoulli 分布相关联的概率，定义为：<br></p>
-<p>考虑所有x都等于c，那么softmax的理论值为1/n。但是在数值计算中，当c量级很大时，可能求不到：</p>
+<p>误差的<strong>下溢</strong> ： 接近零的的数被四舍五入为零。很多时候等于零与接近零的表现质的不同。<br><strong>上溢</strong>：当大量级的数被近似为$\infty, -\infty$,进一步计算会导致非数字。<br>例如softmax函数，经常用于预测与multinoulli 分布相关联的概率，定义为：<br><img src="/images/53235938.png" width="50%"></p>
+<p>考虑所有$x$都等于$c$，那么softmax的理论值为$\frac{1}{n}$。但是在数值计算中，当$c$量级很大时，可能求不到：</p>
 <ul>
-<li>If c is very negative, $\exp (c)$会underflow：造成分母为0。</li>
-<li>c是一个很大数，造成$\exp (c)$overflow；</li>
+<li>If $c$ is very negative, $\exp (c)$会underflow：造成分母为0。</li>
+<li>$c$是一个很大数，造成$\exp (c)$overflow；</li>
 </ul>
-<p>通过计算$\mathrm{softmax} (\boldsymbol{z})$来避免，其中 $\boldsymbol{z = x} - \max _i x_i$ :</p>
+<p>我们可以通过计算$\mathrm{softmax} (\boldsymbol{z})$来避免这些问题，其中 $\boldsymbol{z = x} - \max _i x_i$ :</p>
 <ul>
 <li>减去$\max _i x_i$导致exp最大参数为0；不会overflow；</li>
-<li>同样的愿意，分布至少有一个值为1，排除分母underflow变成被0除的可能。</li>
+<li>同样的原因，分布至少有一个值为1，排除分母underflow变成被0除的可能。</li>
 </ul>
-<p>另外分子的underflow可导致整体结果为零。若在计算log softmax(x) 函数中，先计算softmax，再代入计算log有可能出现负无穷结果。所以我们要实现一个单独的函数以数值稳定的方式来计算。</p>
+<p>另外分子的underflow可导致整体结果为零。若在计算$log (softmax(x))$ 函数中，先计算softmax，再代入计算log有可能出现负无穷结果。所以我们要实现一个单独的函数以数值稳定的方式来计算。</p>
 <p><strong>所以计算时一定要考虑数值不稳定的问题，必须设计为最小化舍入误差的积累</strong>。</p>
 <h2 id="病态条件数Poor-Conditioning"><a href="#病态条件数Poor-Conditioning" class="headerlink" title="病态条件数Poor Conditioning"></a>病态条件数Poor Conditioning</h2><p><strong>条件数conditioning是指函数相对于输入的微小变化而变化的快慢程度</strong>，而迅速变化的函数是不理想的：舍入误差会造成很大的变化。</p>
 <p>考虑函数$f(x) = A^{-1} x$, 当$A \in \mathbb{R}^{n \times n}$具有特征分解时，其条件数为：<br>$$\underset{i,j}{\max}~ \Bigg| \frac{\lambda_i}{ \lambda_j} \Bigg|.$$<br>这是最大和最小特征值的模之比,当该数很大时，矩阵求逆对输入的误差特别敏感。<br>注意这种敏感性是矩阵本身的固有特性，而不是矩阵求逆期间舍入误差的结果。 即使我们乘以完全正确的矩阵逆，病态条件的矩阵也会放大预先存在的误差。 在实践中，该错误将与求逆过程本身的数值误差进一步复合。</p>
@@ -246,77 +234,6 @@ var _hmt = _hmt || [];
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2017/08/19/numCalculate01/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-hello-world" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/08/18/hello-world/">Hello World</a>
-    </h1>
-  
-
-        
-        <a href="/2017/08/18/hello-world/" class="archive-article-date">
-  	<time datetime="2017-08-18T12:23:05.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-18</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/08/18/hello-world/">展开全文 >></a>
         </p>
       
 

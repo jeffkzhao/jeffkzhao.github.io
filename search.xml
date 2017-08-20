@@ -3,7 +3,7 @@
   <entry>
     <title><![CDATA[数值计算需要注意的问题]]></title>
     <url>%2F2017%2F08%2F19%2FnumCalculate01%2F</url>
-    <content type="text"><![CDATA[机器学习需要大量数值计算，通过迭代地更新解来解决数学问题的算法，常见的操作包括优化(找到最小化或最大化函数值的参数)和线性方程组的求解。 Overflow and Underflow上溢和下溢数字计算机无法对实数进行”精确”表示,总会引入些误差（大部分是舍入误差rounding errors）。当这些误差被复合累积操作时，会造成一些问题。 误差的下溢 ： 接近零的的数被四舍五入为零。很多时候等于零与接近零的表现质的不同。上溢：当大量级的数被近似为$\infty, -\infty$,进一步计算会导致非数字。在softmax函数，经常用于预测与multinoulli 分布相关联的概率，定义为： 考虑所有x都等于c，那么softmax的理论值为1/n。但是在数值计算中，当c量级很大时，可能求不到： If c is very negative, $\exp (c)$会underflow：造成分母为0。 c是一个很大数，造成$\exp (c)$overflow； 通过计算$\mathrm{softmax} (\boldsymbol{z})$来避免，其中 $\boldsymbol{z = x} - \max _i x_i$ : 减去$\max _i x_i$导致exp最大参数为0；不会overflow； 同样的愿意，分布至少有一个值为1，排除分母underflow变成被0除的可能。 另外分子的underflow可导致整体结果为零。若在计算log softmax(x) 函数中，先计算softmax，再代入计算log有可能出现负无穷结果。所以我们要实现一个单独的函数以数值稳定的方式来计算。 所以计算时一定要考虑数值不稳定的问题，必须设计为最小化舍入误差的积累。 病态条件数Poor Conditioning条件数conditioning是指函数相对于输入的微小变化而变化的快慢程度，而迅速变化的函数是不理想的：舍入误差会造成很大的变化。 考虑函数$f(x) = A^{-1} x$, 当$A \in \mathbb{R}^{n \times n}$具有特征分解时，其条件数为：$$\underset{i,j}{\max}~ \Bigg| \frac{\lambda_i}{ \lambda_j} \Bigg|.$$这是最大和最小特征值的模之比,当该数很大时，矩阵求逆对输入的误差特别敏感。注意这种敏感性是矩阵本身的固有特性，而不是矩阵求逆期间舍入误差的结果。 即使我们乘以完全正确的矩阵逆，病态条件的矩阵也会放大预先存在的误差。 在实践中，该错误将与求逆过程本身的数值误差进一步复合。]]></content>
+    <content type="text"><![CDATA[数值计算中，需要考虑计算机精度带来的一些问题。 Overflow and Underflow上溢和下溢数字计算机无法对实数进行”精确”表示,总会引入些误差（大部分是舍入误差rounding errors）。当这些误差被复合累积操作时，会造成一些问题。 误差的下溢 ： 接近零的的数被四舍五入为零。很多时候等于零与接近零的表现质的不同。上溢：当大量级的数被近似为$\infty, -\infty$,进一步计算会导致非数字。例如softmax函数，经常用于预测与multinoulli 分布相关联的概率，定义为： 考虑所有$x$都等于$c$，那么softmax的理论值为$\frac{1}{n}$。但是在数值计算中，当$c$量级很大时，可能求不到： If $c$ is very negative, $\exp (c)$会underflow：造成分母为0。 $c$是一个很大数，造成$\exp (c)$overflow； 我们可以通过计算$\mathrm{softmax} (\boldsymbol{z})$来避免这些问题，其中 $\boldsymbol{z = x} - \max _i x_i$ : 减去$\max _i x_i$导致exp最大参数为0；不会overflow； 同样的原因，分布至少有一个值为1，排除分母underflow变成被0除的可能。 另外分子的underflow可导致整体结果为零。若在计算$log (softmax(x))$ 函数中，先计算softmax，再代入计算log有可能出现负无穷结果。所以我们要实现一个单独的函数以数值稳定的方式来计算。 所以计算时一定要考虑数值不稳定的问题，必须设计为最小化舍入误差的积累。 病态条件数Poor Conditioning条件数conditioning是指函数相对于输入的微小变化而变化的快慢程度，而迅速变化的函数是不理想的：舍入误差会造成很大的变化。 考虑函数$f(x) = A^{-1} x$, 当$A \in \mathbb{R}^{n \times n}$具有特征分解时，其条件数为：$$\underset{i,j}{\max}~ \Bigg| \frac{\lambda_i}{ \lambda_j} \Bigg|.$$这是最大和最小特征值的模之比,当该数很大时，矩阵求逆对输入的误差特别敏感。注意这种敏感性是矩阵本身的固有特性，而不是矩阵求逆期间舍入误差的结果。 即使我们乘以完全正确的矩阵逆，病态条件的矩阵也会放大预先存在的误差。 在实践中，该错误将与求逆过程本身的数值误差进一步复合。]]></content>
       <categories>
         <category>math</category>
       </categories>
@@ -12,10 +12,5 @@
         <tag>overflow &amp; underflow</tag>
         <tag>poor conditioning</tag>
       </tags>
-  </entry>
-  <entry>
-    <title><![CDATA[Hello World]]></title>
-    <url>%2F2017%2F08%2F18%2Fhello-world%2F</url>
-    <content type="text"><![CDATA[Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick StartCreate a new post1$ hexo new "My New Post" More info: Writing Run server1$ hexo server More info: Server Generate static files1$ hexo generate More info: Generating Deploy to remote sites1$ hexo deploy More info: Deployment]]></content>
   </entry>
 </search>
