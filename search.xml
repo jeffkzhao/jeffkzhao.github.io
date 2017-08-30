@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[机器学习概述]]></title>
+    <url>%2F2017%2F08%2F30%2FmachineLearning%2F</url>
+    <content type="text"><![CDATA[机器学习: 从数据中学到知识。 Computer program is said to learn from experience E with respect to some task T and some performance measure P, if its performance on T, as measured by P improves with experience E. from Tom Mitchell,1998. T: 任务； P: performance measure E: experience经验，实验 基于E的不断学习，通过P的指标得出在T上的表现得到改进，我们就说程序通过经验E来学习该任务。 如预计房价： 最简单的方法就是用一根直线(也就是一次方程)来预测，用二次函数能够得到更好的结果： 这种学习称为 监督学习 supervised learning: 预先有正确的结果，可以用来指导，检验算法的正确性。 监督学习 supervised learning 1 回归regression ： 连续值预测 2 分类classification： 离散值预测，如何根据特征将对象分到不同的分类中(赋予不同的离散值) - 上面的例子只用到两个特征 features，更多的特征处理可能需要其他算法，如SVM。 非监督学习 unsupervised learning 特点：训练数据只有特征，没有结果：发现这些数据是否可以分为不同的组,应用包括： 聚类问题Clustering 声音辨别：将不同人的声音分离，使用双麦克，位置的远近，角度会造成声音的大小等不同。使用svd一行代码就能解决。 References 吴恩达，《Machine learning》，Coursera.]]></content>
+      <categories>
+        <category>吴恩达Coursera笔记</category>
+      </categories>
+  </entry>
+  <entry>
     <title><![CDATA[为什么梯度反方向下降最快？]]></title>
     <url>%2F2017%2F08%2F20%2FwhyDescent%2F</url>
     <content type="text"><![CDATA[梯度下降算法中，为什么沿着梯度反方向是下降最快呢？用一种直观的方法”证明”一下。考虑两个features的情况。首先用泰勒一阶展开，问题转换为在点(a,b)附近（我们可以限制在以点为圆心的圆内）哪个方向可以使得函数值最小？ 转换成一个更好理解的公式：看一下公式的后两项，就是两个向量的点积，$[u,v]^ \top$是已知的，要使点积值最小（这里负值是最小的了），当然是和$[u,v]^ \top$方向相反，并且尽可能远的向量了： 参考 李宏毅，《machine learning》]]></content>
