@@ -6,16 +6,27 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="jeffkzhao.github.io">
-  <title>分类 | blog</title>
+  <title>3 多变量线性回归 | blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="分类">
-<meta property="og:url" content="jeffkzhao.github.io/categories/index.html">
+  <meta name="description" content="实际应用场景中一般都是多个features特征，例如房间数，楼层等，构成一个多变量的模型，模型中的特征为$（x_1,x_2,…,x_n）$：      $n$                            特征的数量 $\boldsymbol{x}^{(i)}$                       第$i$个训练实例，是特征矩阵中的第$i$行，是一个向量（vector）。 $x^{">
+<meta name="keywords" content="machine-learning,linear-regression">
+<meta property="og:type" content="article">
+<meta property="og:title" content="3 多变量线性回归">
+<meta property="og:url" content="jeffkzhao.github.io/2017/08/30/linearRegressionWithMultiVariable/index.html">
 <meta property="og:site_name" content="blog">
+<meta property="og:description" content="实际应用场景中一般都是多个features特征，例如房间数，楼层等，构成一个多变量的模型，模型中的特征为$（x_1,x_2,…,x_n）$：      $n$                            特征的数量 $\boldsymbol{x}^{(i)}$                       第$i$个训练实例，是特征矩阵中的第$i$行，是一个向量（vector）。 $x^{">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-08-19T08:45:55.000Z">
+<meta property="og:image" content="/images/d0351388-7c9a-4e8b-a197-6296e82c99ab.jpg">
+<meta property="og:image" content="/images/igjyi7988g.png">
+<meta property="og:image" content="/images/fkgj69kfj589gckv.png">
+<meta property="og:image" content="/images/gkyig9182jfhmvn.jpg">
+<meta property="og:image" content="/images/fkgj79fkvm7jhj6h5j.jpg">
+<meta property="og:image" content="/images/k7918fhri5837kg890xbz.png">
+<meta property="og:updated_time" content="2017-08-30T06:40:41.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="分类">
+<meta name="twitter:title" content="3 多变量线性回归">
+<meta name="twitter:description" content="实际应用场景中一般都是多个features特征，例如房间数，楼层等，构成一个多变量的模型，模型中的特征为$（x_1,x_2,…,x_n）$：      $n$                            特征的数量 $\boldsymbol{x}^{(i)}$                       第$i$个训练实例，是特征矩阵中的第$i$行，是一个向量（vector）。 $x^{">
+<meta name="twitter:image" content="/images/d0351388-7c9a-4e8b-a197-6296e82c99ab.jpg">
   
     <link rel="alternative" href="/atom.xml" title="blog" type="application/atom+xml">
   
@@ -153,27 +164,70 @@ var _hmt = _hmt || [];
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="categories-" class="article article-type-categories " itemscope itemprop="blogPost">
+            <article id="post-linearRegressionWithMultiVariable" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      分类
+      3 多变量线性回归
     </h1>
   
 
         
-        <a href="/categories/index.html" class="archive-article-date">
-  	<time datetime="2017-08-19T08:45:55.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-19</time>
+        <a href="/2017/08/30/linearRegressionWithMultiVariable/" class="archive-article-date">
+  	<time datetime="2017-08-30T06:06:33.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-30</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <p>实际应用场景中一般<strong>都是多个features特征</strong>，例如房间数，楼层等，构成一个多变量的模型，模型中的特征为$（x_1,x_2,…,x_n）$：</p>
+<p><img src="/images/d0351388-7c9a-4e8b-a197-6296e82c99ab.jpg" width="50%">   </p>
+<ul>
+<li>$n$                            特征的数量</li>
+<li>$\boldsymbol{x}^{(i)}$                       第$i$个训练实例，是特征矩阵中的第$i$行，是一个向量（vector）。</li>
+<li>$x^{(i)}_j  $                第$i$个训练实例的第$j$个特征，即特征矩阵中第$i$行的第$j$个特征。</li>
+</ul>
+<h2 id="多变量线性回归"><a href="#多变量线性回归" class="headerlink" title="多变量线性回归"></a>多变量线性回归</h2><ul>
+<li>支持多变量的假设$h$ 为：<br>$$h_{\theta}(x) = \theta_0 + \theta_1 x_1  \theta_2 x_2 + … + \theta_n x_n$$</li>
+</ul>
+<ul>
+<li>有 $n+1$ 个参数和$ n$ 个变量，为了方便处理，引入$x_0 = 1$，公式转换为: </li>
+</ul>
+<p>$$h_{\theta}(x) = \theta_0 x_0 + \theta_1 x_1  \theta_2 x_2 + … + \theta_n x_n$$</p>
+<p>这样，<strong>参数 $n+1$ 维的向量，训练实例也是一个$n+1$ 维向量</strong>，我们就可以直接用矩阵操作了。</p>
+<ul>
+<li>特征矩阵(训练实例) 维度是 $m×(n+1)$, 公式也就简化为：</li>
+</ul>
+<p>$$h_{\theta} (\boldsymbol{X}) = \theta ^\mathrm{\top} \boldsymbol{X}$$    </p>
+<h2 id="多变量梯度下降gradient-Descent-for-multiple-variables"><a href="#多变量梯度下降gradient-Descent-for-multiple-variables" class="headerlink" title="多变量梯度下降gradient Descent for multiple variables"></a>多变量梯度下降gradient Descent for multiple variables</h2><p>与单变量梯度下降相似，构造损失函数：</p>
+<p>$$J(\theta_0 , \theta_1 ,…,\theta_n) = \frac{1}{2m} \sum^m_{i=1}(h_{\theta} (x^{(i)}) - y^{(i)})^2$$</p>
+<p>对$\theta_i$的参数求导，批量梯度下降，直到收敛：</p>
+<p><img src="/images/igjyi7988g.png" width="30%"> </p>
+<p>求导后，代入：</p>
+<p><img src="/images/fkgj69kfj589gckv.png" width="30%"> </p>
+<p>计算过程是先随机选取一系列参数值，然后计算预测结果，代入上式，更新参数值，直到参数收敛。<br>这里会遇到一些问题，<strong>一个是不同参数的尺度问题，还有的学习率问题</strong>，下面的2个tricks可以帮助解决这些问题：</p>
+<h3 id="特征缩放-Feature-Scaling"><a href="#特征缩放-Feature-Scaling" class="headerlink" title="特征缩放 Feature Scaling"></a>特征缩放 Feature Scaling</h3><p>以上面的房价预测为例，房间数为0-5，尺寸是0-2000平方英尺，这样<strong>画出来的等高线是一个很长的椭圆</strong>，需要很多次迭代才能收敛：</p>
+<p><img src="/images/gkyig9182jfhmvn.jpg" width="30%"> </p>
+<p>为了使收敛速度更快（另外不同的数据级在其他的算法中可能需要一起操作，<strong>大级别的参数会覆盖小级别参数的变化</strong>），我们要保证<strong>这些特征具有相似的尺度similar scale</strong>，可以帮助梯度更快的收敛：<br><img src="/images/fkgj79fkvm7jhj6h5j.jpg" width="30%"> </p>
+<p>解决的方法是尝试将参数的范围放大[-1, 1]间，最简单的方法是：<br>$$x_n=\frac{x_n - \mu_n}{S_n}$$</p>
+<p>其中 $\mu_n$ 是平均值，$S_n$是 标准差。 简单的说就是这个：<br>$$x^*_i=\frac{x_i - \bar{x}}{x_{max} - x_{min}}$$</p>
+<p><strong>特征缩放也称为： Normalization 归一化</strong></p>
+<h3 id="学习率learning-rate"><a href="#学习率learning-rate" class="headerlink" title="学习率learning rate"></a>学习率learning rate</h3><ul>
+<li>收敛所需要的迭代次数根据模型不同而不同，可以用迭代次数与代价函数的图标来感官的查看：</li>
+</ul>
+<p><img src="/images/k7918fhri5837kg890xbz.png" width="30%"> </p>
+<ul>
+<li>代价函数应该在<strong>每次迭代后都应该有所减少，直到收敛</strong>，上图最后的浅蓝部分就收敛的不错了。</li>
+<li><strong>学习率过小，迭代次数太多，学习率太大，可能会错过局部最小值</strong>，通常考虑下面的学习率：<ul>
+<li><strong>0.01，0.03，0.1，0.3，1，3， 10</strong></li>
+</ul>
+</li>
+</ul>
+
       
 
       
@@ -212,7 +266,33 @@ var _hmt = _hmt || [];
     <div class="article-info article-info-index">
       
       
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">machine-learning</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">linear-regression</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
       
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/吴恩达Coursera笔记/" class="article-tag-list-link color4">吴恩达Coursera笔记</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
 
       
 
@@ -262,7 +342,7 @@ var _hmt = _hmt || [];
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="http://s.jiathis.com/qrcode.php?url=http:jeffkzhao.github.io/categories/" alt="微信分享二维码">
+      <img src="http://s.jiathis.com/qrcode.php?url=http:jeffkzhao.github.io/2017/08/30/linearRegressionWithMultiVariable/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -274,6 +354,16 @@ var _hmt = _hmt || [];
 </article>
 
   
+<nav id="article-nav">
+  
+  
+    <a href="/2017/08/30/linearRegressionWithOneVariable/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">2 单变量线性回归</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
 
 <aside class="wrap-side-operation">
     <div class="mod-side-operation">
@@ -295,7 +385,7 @@ var _hmt = _hmt || [];
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    目录，不存在的…
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#多变量线性回归"><span class="toc-number">1.</span> <span class="toc-text">多变量线性回归</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#多变量梯度下降gradient-Descent-for-multiple-variables"><span class="toc-number">2.</span> <span class="toc-text">多变量梯度下降gradient Descent for multiple variables</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#特征缩放-Feature-Scaling"><span class="toc-number">2.1.</span> <span class="toc-text">特征缩放 Feature Scaling</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#学习率learning-rate"><span class="toc-number">2.2.</span> <span class="toc-text">学习率learning rate</span></a></li></ol></li></ol>
                     </div>
                 </span>
             </div>
@@ -351,7 +441,7 @@ var _hmt = _hmt || [];
 	var yiliaConfig = {
 		mathjax: true,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
 		isTag: false,
 		isCategory: false,
