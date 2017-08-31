@@ -1,14 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title><![CDATA[sigmoid]]></title>
+    <title><![CDATA[8 正则化Regularization]]></title>
+    <url>%2F2017%2F08%2F31%2Fregularization%2F</url>
+    <content type="text"><![CDATA[正则化的目的就是把曲线拉得缓和些。 过拟合high variance我们可能有很多的特征，训练出来的模型和训练集拟合的也非常好，但对新数据的预测却不准，这有可以就是过拟合. - 上面分别是： 线性/欠拟合；二次/恰当；4次/过拟合- 但不是说用的4次就没有二次好，而是次数越多，θ 值会变得非常大以达到能拟合训练集的目的，曲线的震荡幅度也会非常大。- 我们需要曲线平滑些，需要一些regulated校准。### Logistic Rgression逻辑回归中的过拟合- 左图欠拟合：high bias: low polynomial- 中间quadratic fit- 右图 high polynomial 过拟合: high variance 如何应对过拟合？xxxx 1 减少feature的数量：去除贡献少的features 可以手工选择，也可以使用Model selection algorithms，如PCA 2正则化regularization （有时也称penalty惩罚） 保留所有的特征，但是减少参数的取值范围（magnitude）：减少该参数对预测的贡献 更小的θ值减少了overfiting的可能 当有很多的features且都对最终结果有较多贡献时，这是个很好的减少过拟合的办法。 正则化代价函数（REGULARIZATION COST FUNCTION）以上面4次方回归为例： $$h_{\theta}(\boldsymbol{x}) = \theta_0 + \theta_1 x_1 + \theta_2 x_2^2 + \theta_3 x_3^3 +\theta_4 x_4^4$$ 要大大减少$\theta_3$和$\theta_4$的大小，我们要做的便是修改代价函数，在其中$\theta_3$和$\theta_4$设置一点惩罚。修改后的代价函数如下： 这样$\theta_3$和$\theta_4$ 的值会很小 (约等于零)，3次方和4次方对最后的结果影响也就小了，模型接近 二次方程 了。 对于非常多的特征，并不知道其中哪些特征我们要惩罚，那么就对所有的特征进行惩罚，得到了一个较为简单的能防止过拟合问题的假设： $\lamda$ 正则化参数（Regularization Parameter） 注意：根据惯例，我们不对θ0进行惩罚。 $\lamda$ 越大，惩罚越重 $\lamda$太大也不行，就欠拟合了： $\lamda=10^10$ ，除了$\theta_0$，其他的$\theta$都接近零了，这样hypothesis 就成了找最合适的一个水平线：$h_{\theta}(x) = \theta_0$：显然，欠拟合了。 $\lamda$ 有自动选择的算法，后面会讲。 正则化线性回归（REGULARIZED LINEAR REGRESSION） 正则化线性回归的代价函数为： 因为没有对$\theta_0$正则化，所以分开处理： 对于$j=1,2,…,n$ 时的更新式子 重写一下，看得更明白： 变化在于，每次都在原有算法更新规则的基础上令$\theta_j$值减少了一个额外的值（$\theta_j$的系数是一个常数，所以每次都要减小一点）：造成$\theta_j$变的更小，影响也就更小了。 也可以利用正规方程来求解正则化线性回归模型，方法如下所示 上式中的矩阵尺寸为$(n+1)\times (n+1)$。 正则化逻辑回归（REGULARIZED LOGISTIC REGRESSION）- 对于逻辑回归，我们也给代价函数增加一个正则化的表达式，得到： 类似，最小化该代价函数，求导，注意区分$\theta_0$： 得出梯度下降算法为： 看上去同线性回正则样，但是知道$h_{\theta}(x) = \sigma (\theta ^{\mathrm{\top}}\boldsymbol{X})$，所以与线性回归不同。]]></content>
+      <categories>
+        <category>吴恩达Coursera笔记</category>
+      </categories>
+      <tags>
+        <tag>machine-learning</tag>
+        <tag>regularization</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[7 逻辑回归]]></title>
     <url>%2F2017%2F08%2F31%2Fsigmoid%2F</url>
-    <content type="text"></content>
+    <content type="text"><![CDATA[前面我们将PGM经过转换，得到一种新的分类方法逻辑回归： 对应的Function set： 下面就是要获取最合适的$w,b$，还是使用最大似然估计：上面$(1-f_{w,b}(x^3))$表示$c2$类的概率。 我们在最大化似然估计前面加上负号，这样就转为了一个最优化问题。因为函数全是乘法，且sigmoid中有指数，我们开$ln$，整个函数表示成加法就简单了：问题就变为：$ argmin \sum -[\hat{y}lnf(x^i) + (1 - \hat{y}^i)ln(1 - f_{w,b}(x^n))]$ 。该公式另一种解释是两个Bernoulli分布的交叉熵： 交叉熵越小，说明分布越接近，也就是我们想得到的目标函数更接近训练集的分布。然后我们就是要优化这个公式，还是梯度下降：求出梯度，然后用学习率更新。$f$是一个sigmoid函数，有$\sigma (z)’ = \sigma (z)(1 - \sigma (z))$ , 这个导数很容易推出，我们看一下sigmoid函数图，就能发现，导数数在0点值最大，两边小： 梯度计算过程如下： 最后我们得到更新公式，和线性回归形式一样，但这里的y只能取1或者0。可以发现，与$\hat{y}$差别越大，step也就越大。 非线性边界对于下面的分类边界： 需要用曲线才能分隔 $y=0$的区域和$y=1$的区域，我们使用二次方程：$$f_{w,b}(\boldsymbol{x}) = \sigma (b + w_1 x_1 + w_2 x_2 +w_3 x_1^2 +w_4 x_2^2)$$ 假设参数是[-1 0 0 1 1]，则判定边界恰好是圆点在原点且半径为1的圆形。 还可以用更复杂的模型来适应非常复杂形状的判定边界:$$f_{w,b}(\boldsymbol{x}) = \sigma (b + w_1 x_1 + w_2 x_2 +w_3 x_1^2 +w_4 x_1^2x_2 + w_5 x_1^2x_2^2 + w_6x_1^3x_2 + …)$$ 如何选择这些模型？？：观察数据 Why not Square Error前面我们的评价函数是通过最大似然估计得到的，为什么不用线性回归中的square error呢？我们可以计算一下，得到square error的梯度： 发现，在当$\hat{y} ^ n= 1$时，$f = 1 OR 0$ 都会使得梯度等于0；$\hat{y} ^ n= 0$时也会出现这种情况。这样square error会很平坦，很难收敛。对比一下根据最大似然得到的交叉熵和square error两种cost function图，前者陡峭容易收敛，后面平坦，很难甚至无法收敛： 最后我们看一下线性回归和逻辑回归的对比： LR vs PGM逻辑回归和概率生成模型虽然都是来自同一个模型（function set相同），但是最终会选择不同的目标函数。 LR最后的w，b更多的是和训练集结合。 PGM包含统计信息更强烈，概率分布带来的额外”脑补“会使得这个模型可能做出一些不正确的判断； 一般认为LR准确率更高。 PGM更适合小训练集的情况，另外对noise容忍度高 多类与softmax多类的分类我们可以采用softmax分类，以三个类分类为例。我们为每个类使用$w,b$,得到每个分类的概率，有： 最后得到的不同z，用softmax归一化：先取指数，然后归一化得到概率： 训练方法类似二分类，最后得到一个3分布的交叉熵： Limitation of Logistic Regression像逻辑回归这类的线性模型没法区分出异或操作： 但是我们对$\boldsymbol{x}$做一个转换后，就能分了： 但是除非你有邻域知识能后帮助你找到这个转换，如异或例子。大多数非线性场景我们无法直接获得这种转换。怎么办？ 我们可以用LR交叠的方式先获取一个转换，然后在执行分类： 这就是神经网络了！]]></content>
+      <categories>
+        <category>吴恩达Coursera笔记</category>
+      </categories>
+      <tags>
+        <tag>machine-learning</tag>
+        <tag>Probabilistic-Generative-Model</tag>
+      </tags>
   </entry>
   <entry>
     <title><![CDATA[6 Probabilistic Generative Model概率生成模型]]></title>
     <url>%2F2017%2F08%2F31%2Fpgm%2F</url>
-    <content type="text"><![CDATA[img{display:block;margin: o auto} 在介绍洛基回归模型之前，我们先了解以下概率生成模型。贝叶斯模型给了我们发现反向概率的方法： 对于一般的分类模型，我们也可以采用类似的方法，若果$P(C_1 | \boldsymbol{x}) &gt; 0.5$ ， $ \boldsymbol{x}$属于$C_1$，否则属于$C_2$。 上面的box，所有的概率分布都很清楚，可以直接得到最终的概率。但对于一个分类来说，我们要求$P(x|C_i)$就需要知道不同分类的概率分布。以一个Pockmon游戏中宠物分类的例子，取了两个类别水类（79个）和普通类（61个）的宠物，每个宠物有6个features。 对于训练集来说，$p(c_1), p(c_2)$是常数，统计一下就可以： 对于一般的分类模型，我们用features向量$\boldsymbol{x}$来表示一个物种。剩下的就是要求$P(\boldsymbol{x}|C_i)$：也就每一个分类中，一个未知$\boldsymbol{x}$在该类出现的概率／密度函数。我们目标是就是需要根据sample数据，得到不同分类的概率密度函数$P(\boldsymbol{x}|C_i)$。假设每个分类服从高斯分布： 我们就需要根据sample 数据得到均值$\mu$, 协方差矩阵covariance matrix $\Sigma$。很自然想到使用最大似然估计得到$\mu ^, \Sigma ^$：得到最接近sample数据的高斯分布。 我们根据最大似然估计，对水类和普通类得到对应的高斯分布（以两个features为例）：对于一个未知的物种$\boldsymbol{x}$,我们就可以得到他在不同类别中的概率，可以用前面的贝叶斯做分类了：最后在测试集的结果不太好，准确率只有47%，用上全部6个features的话，准确率是64%。### 模型改进前面两个分类的covariance matrix 是在各自分类中计算得到的，结果不同。现在把他们的covariance matrix 变成一个，目的是减少模型的偏差variance，也就是降低模型复杂度，减少overfitting。计算方法也很简单，就是将原来分类的$\Sigma ^i$做一个加权平均即可。再用新的参数来做分类，准确率提高到了73%！。可以看出，分类边界变成了线性边界,分类的模型也就变成了线性模型了，后面我们再看为什么变成了线性模型。总结一下，这种模型分为3步： 概率分布的选择前面我们使用的是多维高斯分布，当然你也可以使用其他的概率分布做，如下面用一维的高斯分布，假设所有的featutes之间独立，那么这就是朴素贝叶斯分类了： 后验概率和Sigmoid函数我们将上面的贝叶斯公式做一下转变： 我们看到，我们将后验概率表示成一个sigmoid函数，而$z$是$\boldsymbol{x}$在两个分类中概率比率的ln值，将出现概率的对比映射到(0,1) 之间，很明显： 当$\boldsymbol{x}$在两类出现的概率相同时，$z = 0$，就是sigmoid函数中间的点。 当$\boldsymbol{x}$在类1中概率更大时，$z &gt; 0$就是右侧。 当$\boldsymbol{x}$在类1中概率更小时，$z &lt; 0$就是左侧。 这样我们用sigmoid表示后验概率： 计算$z$的表达式： $z$看着挺复杂的，那么把上面的$\Sigma ^1, \Sigma ^2$按照前面的做法合一做进一步简化，可以更清晰的将$z$表示为一个一维函数了： (哇哇！！逻辑回归的味道来了！)这样经过一系列计算，我们将PGM模型转换为了基于sigmoid的线性模型（当然我们是简化合并了$\Sigma$），这就能解释上面的宠物分类在$\Sigma$合并后由曲线的分类边界变成了线性的分类边界了。]]></content>
+    <content type="text"><![CDATA[在介绍洛基回归模型之前，我们先了解以下概率生成模型。贝叶斯模型给了我们发现反向概率的方法： 对于一般的分类模型，我们也可以采用类似的方法，若果$P(C_1 | \boldsymbol{x}) &gt; 0.5$ ， $ \boldsymbol{x}$属于$C_1$，否则属于$C_2$。 上面的box，所有的概率分布都很清楚，可以直接得到最终的概率。但对于一个分类来说，我们要求$P(x|C_i)$就需要知道不同分类的概率分布。以一个Pockmon游戏中宠物分类的例子，取了两个类别水类（79个）和普通类（61个）的宠物，每个宠物有6个features。 对于训练集来说，$p(c_1), p(c_2)$是常数，统计一下就可以： 对于一般的分类模型，我们用features向量$\boldsymbol{x}$来表示一个物种。剩下的就是要求$P(\boldsymbol{x}|C_i)$：也就每一个分类中，一个未知$\boldsymbol{x}$在该类出现的概率／密度函数。我们目标是就是需要根据sample数据，得到不同分类的概率密度函数$P(\boldsymbol{x}|C_i)$。假设每个分类服从高斯分布： 我们就需要根据sample 数据得到均值$\mu$, 协方差矩阵covariance matrix $\Sigma$。很自然想到使用最大似然估计得到$\mu ^, \Sigma ^$：得到最接近sample数据的高斯分布。 我们根据最大似然估计，对水类和普通类得到对应的高斯分布（以两个features为例）：对于一个未知的物种$\boldsymbol{x}$,我们就可以得到他在不同类别中的概率，可以用前面的贝叶斯做分类了：最后在测试集的结果不太好，准确率只有47%，用上全部6个features的话，准确率是64%。### 模型改进前面两个分类的covariance matrix 是在各自分类中计算得到的，结果不同。现在把他们的covariance matrix 变成一个，目的是减少模型的偏差variance，也就是降低模型复杂度，减少overfitting。计算方法也很简单，就是将原来分类的$\Sigma ^i$做一个加权平均即可。再用新的参数来做分类，准确率提高到了73%！。可以看出，分类边界变成了线性边界,分类的模型也就变成了线性模型了，后面我们再看为什么变成了线性模型。总结一下，这种模型分为3步： 概率分布的选择前面我们使用的是多维高斯分布，当然你也可以使用其他的概率分布做，如下面用一维的高斯分布，假设所有的featutes之间独立，那么这就是朴素贝叶斯分类了： 后验概率和Sigmoid函数我们将上面的贝叶斯公式做一下转变： 我们看到，我们将后验概率表示成一个sigmoid函数，而$z$是$\boldsymbol{x}$在两个分类中概率比率的ln值，将出现概率的对比映射到(0,1) 之间，很明显： 当$\boldsymbol{x}$在两类出现的概率相同时，$z = 0$，就是sigmoid函数中间的点。 当$\boldsymbol{x}$在类1中概率更大时，$z &gt; 0$就是右侧。 当$\boldsymbol{x}$在类1中概率更小时，$z &lt; 0$就是左侧。 这样我们用sigmoid表示后验概率： 计算$z$的表达式： $z$看着挺复杂的，那么把上面的$\Sigma ^1, \Sigma ^2$按照前面的做法合一做进一步简化，可以更清晰的将$z$表示为一个一维函数了： (哇哇！！逻辑回归的味道来了！)这样经过一系列计算，我们将PGM模型转换为了基于sigmoid的线性模型（当然我们是简化合并了$\Sigma$），这就能解释上面的宠物分类在$\Sigma$合并后由曲线的分类边界变成了线性的分类边界了。]]></content>
       <categories>
         <category>吴恩达Coursera笔记</category>
       </categories>
@@ -62,8 +81,8 @@
       </categories>
       <tags>
         <tag>machine-learning</tag>
-        <tag>gradient-descent</tag>
         <tag>linear-regression</tag>
+        <tag>gradient-descent</tag>
       </tags>
   </entry>
   <entry>

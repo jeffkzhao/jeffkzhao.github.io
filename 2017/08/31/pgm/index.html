@@ -8,13 +8,13 @@
   <link rel="dns-prefetch" href="jeffkzhao.github.io">
   <title>6 Probabilistic Generative Model概率生成模型 | blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="img{display:block;margin: o auto} 在介绍洛基回归模型之前，我们先了解以下概率生成模型。贝叶斯模型给了我们发现反向概率的方法：   对于一般的分类模型，我们也可以采用类似的方法，若果$P(C_1 | \boldsymbol{x}) &amp;gt; 0.5$ ， $ \boldsymbol{x}$属于$C_1$，否则属于$C_2$。    上面的box，所有的概率分布都很清">
+  <meta name="description" content="在介绍洛基回归模型之前，我们先了解以下概率生成模型。贝叶斯模型给了我们发现反向概率的方法：   对于一般的分类模型，我们也可以采用类似的方法，若果$P(C_1 | \boldsymbol{x}) &amp;gt; 0.5$ ， $ \boldsymbol{x}$属于$C_1$，否则属于$C_2$。    上面的box，所有的概率分布都很清楚，可以直接得到最终的概率。但对于一个分类来说，我们要求$P(x|C">
 <meta name="keywords" content="machine-learning,Probabilistic-Generative-Model">
 <meta property="og:type" content="article">
 <meta property="og:title" content="6 Probabilistic Generative Model概率生成模型">
 <meta property="og:url" content="jeffkzhao.github.io/2017/08/31/pgm/index.html">
 <meta property="og:site_name" content="blog">
-<meta property="og:description" content="img{display:block;margin: o auto} 在介绍洛基回归模型之前，我们先了解以下概率生成模型。贝叶斯模型给了我们发现反向概率的方法：   对于一般的分类模型，我们也可以采用类似的方法，若果$P(C_1 | \boldsymbol{x}) &amp;gt; 0.5$ ， $ \boldsymbol{x}$属于$C_1$，否则属于$C_2$。    上面的box，所有的概率分布都很清">
+<meta property="og:description" content="在介绍洛基回归模型之前，我们先了解以下概率生成模型。贝叶斯模型给了我们发现反向概率的方法：   对于一般的分类模型，我们也可以采用类似的方法，若果$P(C_1 | \boldsymbol{x}) &amp;gt; 0.5$ ， $ \boldsymbol{x}$属于$C_1$，否则属于$C_2$。    上面的box，所有的概率分布都很清楚，可以直接得到最终的概率。但对于一个分类来说，我们要求$P(x|C">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="/images/36640304.png">
 <meta property="og:image" content="/images/36663045.png">
@@ -33,10 +33,10 @@
 <meta property="og:image" content="/images/40049469.png">
 <meta property="og:image" content="/images/40096001.png">
 <meta property="og:image" content="/images/40241662.png">
-<meta property="og:updated_time" content="2017-08-31T03:17:10.000Z">
+<meta property="og:updated_time" content="2017-08-31T03:20:00.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="6 Probabilistic Generative Model概率生成模型">
-<meta name="twitter:description" content="img{display:block;margin: o auto} 在介绍洛基回归模型之前，我们先了解以下概率生成模型。贝叶斯模型给了我们发现反向概率的方法：   对于一般的分类模型，我们也可以采用类似的方法，若果$P(C_1 | \boldsymbol{x}) &amp;gt; 0.5$ ， $ \boldsymbol{x}$属于$C_1$，否则属于$C_2$。    上面的box，所有的概率分布都很清">
+<meta name="twitter:description" content="在介绍洛基回归模型之前，我们先了解以下概率生成模型。贝叶斯模型给了我们发现反向概率的方法：   对于一般的分类模型，我们也可以采用类似的方法，若果$P(C_1 | \boldsymbol{x}) &amp;gt; 0.5$ ， $ \boldsymbol{x}$属于$C_1$，否则属于$C_2$。    上面的box，所有的概率分布都很清楚，可以直接得到最终的概率。但对于一个分类来说，我们要求$P(x|C">
 <meta name="twitter:image" content="/images/36640304.png">
   
     <link rel="alternative" href="/atom.xml" title="blog" type="application/atom+xml">
@@ -195,8 +195,7 @@ var _hmt = _hmt || [];
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>img{display:block;margin: o auto}</p>
-<p>在介绍洛基回归模型之前，我们先了解以下概率生成模型。<br>贝叶斯模型给了我们发现反向概率的方法：</p>
+        <p>在介绍洛基回归模型之前，我们先了解以下概率生成模型。<br>贝叶斯模型给了我们发现反向概率的方法：</p>
 <center><img src="/images/36640304.png" width="70%"></center>
 
 <p>对于一般的分类模型，我们也可以采用类似的方法，<strong>若果$P(C_1 | \boldsymbol{x}) &gt; 0.5$ ， $ \boldsymbol{x}$属于$C_1$，否则属于$C_2$</strong>。</p>
@@ -359,7 +358,7 @@ var _hmt = _hmt || [];
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          sigmoid
+          7 逻辑回归
         
       </div>
     </a>
@@ -544,19 +543,11 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">gradient-descent</a>
+                <a href="javascript:void(0)" class="js-tag color5">classification</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">linear-regression</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Probabilistic-Generative-Model</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">classification</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -569,6 +560,18 @@ MathJax.Hub.Queue(function() {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">poor conditioning</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">gradient-descent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Probabilistic-Generative-Model</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">regularization</a>
               </li>
              
               <li class="article-tag-list-item">

@@ -6,16 +6,41 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="jeffkzhao.github.io">
-  <title>sigmoid | blog</title>
+  <title>7 逻辑回归 | blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="article">
-<meta property="og:title" content="sigmoid">
+  <meta name="description" content="前面我们将PGM经过转换，得到一种新的分类方法逻辑回归：   对应的Function set： 下面就是要获取最合适的$w,b$，还是使用最大似然估计：上面$(1-f_{w,b}(x^3))$表示$c2$类的概率。 我们在最大化似然估计前面加上负号，这样就转为了一个最优化问题。因为函数全是乘法，且sigmoid中有指数，我们开$ln$，整个函数表示成加法就简单了：问题就变为：$ argmin \s">
+<meta name="keywords" content="machine-learning,Probabilistic-Generative-Model">
+<meta property="og:type" content="article">
+<meta property="og:title" content="7 逻辑回归">
 <meta property="og:url" content="jeffkzhao.github.io/2017/08/31/sigmoid/index.html">
 <meta property="og:site_name" content="blog">
+<meta property="og:description" content="前面我们将PGM经过转换，得到一种新的分类方法逻辑回归：   对应的Function set： 下面就是要获取最合适的$w,b$，还是使用最大似然估计：上面$(1-f_{w,b}(x^3))$表示$c2$类的概率。 我们在最大化似然估计前面加上负号，这样就转为了一个最优化问题。因为函数全是乘法，且sigmoid中有指数，我们开$ln$，整个函数表示成加法就简单了：问题就变为：$ argmin \s">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-08-31T03:18:26.000Z">
+<meta property="og:image" content="/images/77324364.png">
+<meta property="og:image" content="/images/77218351.png">
+<meta property="og:image" content="/images/e6c98b47-b33e-426b-95d3-6c984a8d8b67.png">
+<meta property="og:image" content="/images/8abe7a74-11c7-4a06-ba29-e515d3905b2b.png">
+<meta property="og:image" content="/images/e18277b2-044e-4f25-9520-02dac8c5d1a4.png">
+<meta property="og:image" content="/images/7f1274cd-beea-41ac-9a61-25fcbab1ef4b.png">
+<meta property="og:image" content="/images/ea6354d6-6de6-4db3-ad71-bc01c2e6feed.png">
+<meta property="og:image" content="/images/2c21d9ab-8511-4787-bceb-a824668cf02f.png">
+<meta property="og:image" content="/images/2db71831-adbb-4890-a637-915603cfb25e.png">
+<meta property="og:image" content="/images/a745ed44-cfea-43eb-aee6-02235e4fc2fd.jpg">
+<meta property="og:image" content="/images/0371f6f5-05e7-4fb7-9bce-f66939d0efac.png">
+<meta property="og:image" content="/images/29f1a793-0b18-4cb5-9bac-29d05ac91ecf.jpg">
+<meta property="og:image" content="/images/3cb71d43-9685-4101-a9f8-de4a462b9158.png">
+<meta property="og:image" content="/images/8a479be5-f4cd-41f4-95d3-090a9e63aad2.png">
+<meta property="og:image" content="/images/130dd1f2-0d0f-44c5-b8f4-969692061ed4.png">
+<meta property="og:image" content="/images/294701aa-398f-4536-81ea-8346a172b519.png">
+<meta property="og:image" content="/images/3bc82cb2-9972-4508-9a69-29bbbcd0ab84.png">
+<meta property="og:image" content="/images/a7884d28-6985-4246-ab6e-8214a1c8fd19.png">
+<meta property="og:image" content="/images/b2e9d3b0-45f7-49b9-89ba-e902d730fd73.png">
+<meta property="og:image" content="/images/4ddf7191-97ae-440f-8564-57fc49bd7fc2.png">
+<meta property="og:updated_time" content="2017-08-31T06:41:23.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="sigmoid">
+<meta name="twitter:title" content="7 逻辑回归">
+<meta name="twitter:description" content="前面我们将PGM经过转换，得到一种新的分类方法逻辑回归：   对应的Function set： 下面就是要获取最合适的$w,b$，还是使用最大似然估计：上面$(1-f_{w,b}(x^3))$表示$c2$类的概率。 我们在最大化似然估计前面加上负号，这样就转为了一个最优化问题。因为函数全是乘法，且sigmoid中有指数，我们开$ln$，整个函数表示成加法就简单了：问题就变为：$ argmin \s">
+<meta name="twitter:image" content="/images/77324364.png">
   
     <link rel="alternative" href="/atom.xml" title="blog" type="application/atom+xml">
   
@@ -160,7 +185,7 @@ var _hmt = _hmt || [];
         
   
     <h1 class="article-title" itemprop="name">
-      sigmoid
+      7 逻辑回归
     </h1>
   
 
@@ -173,7 +198,55 @@ var _hmt = _hmt || [];
     
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <p>前面我们将PGM经过转换，得到一种新的分类方法<strong>逻辑回归</strong>：</p>
+<center><img src="/images/77324364.png" width="66%"></center>
+
+<p>对应的Function set：</p>
+<center><img src="/images/77218351.png" width="66%"></center><br>下面就是要获取最合适的$w,b$，还是使用最大似然估计：<br><center><img src="/images/e6c98b47-b33e-426b-95d3-6c984a8d8b67.png" width="66%"></center><br><strong>上面$(1-f_{w,b}(x^3))$表示$c2$类的概率</strong>。 我们在最大化似然估计前面加上负号，这样就转为了一个最优化问题。因为函数全是乘法，且sigmoid中有指数，我们开$ln$，整个函数表示成加法就简单了：<br><center><img src="/images/8abe7a74-11c7-4a06-ba29-e515d3905b2b.png" width="66%"></center><br>问题就变为：$ argmin \sum -[\hat{y}lnf(x^i) + (1 - \hat{y}^i)ln(1 - f_{w,b}(x^n))]$ 。<br>该公式另一种解释是两个Bernoulli分布的交叉熵：<br><center><img src="/images/e18277b2-044e-4f25-9520-02dac8c5d1a4.png" width="66%"></center>
+
+<p><strong>交叉熵越小，说明分布越接近，也就是我们想得到的目标函数更接近训练集的分布。</strong><br>然后我们就是要优化这个公式，还是梯度下降：求出梯度，然后用学习率更新。$f$是一个sigmoid函数，有$\sigma (z)’ = \sigma (z)(1 - \sigma (z))$ , 这个导数很容易推出，我们看一下sigmoid函数图，就能发现，导数数在0点值最大，两边小：</p>
+<center><img src="/images/7f1274cd-beea-41ac-9a61-25fcbab1ef4b.png" width="30%"></center><br> 梯度计算过程如下：<br><center><img src="/images/ea6354d6-6de6-4db3-ad71-bc01c2e6feed.png" width="66%"></center><br><center><img src="/images/2c21d9ab-8511-4787-bceb-a824668cf02f.png" width="66%"></center><br><center><img src="/images/2db71831-adbb-4890-a637-915603cfb25e.png" width="66%"></center>
+
+
+<p>最后我们得到更新公式，和线性回归形式一样，但这里的y只能取1或者0。可以发现，与$\hat{y}$差别越大，step也就越大。</p>
+<h3 id="非线性边界"><a href="#非线性边界" class="headerlink" title="非线性边界"></a>非线性边界</h3><p>对于下面的分类边界：</p>
+<center><img src="/images/a745ed44-cfea-43eb-aee6-02235e4fc2fd.jpg" width="30%"></center>
+
+<p><strong>需要用曲线才能分隔</strong> $y=0$的区域和$y=1$的区域，我们<strong>使用二次方程</strong>：<br>$$f_{w,b}(\boldsymbol{x}) = \sigma (b + w_1 x_1 + w_2 x_2 +w_3 x_1^2 +w_4 x_2^2)$$</p>
+<ul>
+<li><strong>假设参数是[-1 0 0 1 1]，则判定边界恰好是圆点在原点且半径为1的圆形。</strong></li>
+<li>还可以用更复杂的模型来适应非常复杂形状的判定边界:<br>$$f_{w,b}(\boldsymbol{x}) = \sigma (b + w_1 x_1 + w_2 x_2 +w_3 x_1^2 +w_4 x_1^2x_2 + w_5 x_1^2x_2^2 + w_6x_1^3x_2 + …)$$</li>
+<li><strong>  如何选择这些模型？？：观察数据</strong></li>
+</ul>
+<h3 id="Why-not-Square-Error"><a href="#Why-not-Square-Error" class="headerlink" title="Why not Square Error"></a>Why not Square Error</h3><p>前面我们的评价函数是通过最大似然估计得到的，<strong>为什么不用线性回归中的square error呢</strong>？我们可以计算一下，得到square error的梯度：</p>
+<center><img src="/images/0371f6f5-05e7-4fb7-9bce-f66939d0efac.png" width="66%"></center>
+
+<p>发现，在当$\hat{y} ^ n= 1$时，$f = 1 OR 0$ 都会使得梯度等于0；$\hat{y} ^ n= 0$时也会出现这种情况。这样square error会很平坦，很难收敛。<br>对比一下根据最大似然得到的交叉熵和square error两种cost function图，前者陡峭容易收敛，后面平坦，很难甚至无法收敛：</p>
+<center><img src="/images/29f1a793-0b18-4cb5-9bac-29d05ac91ecf.jpg" width="66%"></center>
+
+<p>最后我们看一下线性回归和逻辑回归的对比：</p>
+<center><img src="/images/3cb71d43-9685-4101-a9f8-de4a462b9158.png" width="66%"></center>
+
+<h3 id="LR-vs-PGM"><a href="#LR-vs-PGM" class="headerlink" title="LR vs PGM"></a>LR vs PGM</h3><p>逻辑回归和概率生成模型虽然都是来自同一个模型<strong>（function set相同）</strong>，但是最终会选择不同的目标函数。</p>
+<center><img src="/images/8a479be5-f4cd-41f4-95d3-090a9e63aad2.png" width="66%"></center>
+
+<ul>
+<li>LR最后的w，b更多的是和训练集结合。</li>
+<li>PGM包含统计信息更强烈，概率分布带来的额外”脑补“会使得这个模型可能做出一些不正确的判断；</li>
+<li>一般认为LR准确率更高。</li>
+<li><strong>PGM更适合小训练集的情况，另外对noise容忍度高</strong></li>
+</ul>
+<h3 id="多类与softmax"><a href="#多类与softmax" class="headerlink" title="多类与softmax"></a>多类与softmax</h3><p>多类的分类我们可以采用softmax分类，以三个类分类为例。我们为每个类使用$w,b$,得到每个分类的概率，有：</p>
+<center><img src="/images/130dd1f2-0d0f-44c5-b8f4-969692061ed4.png" width="66%"></center><br>最后得到的不同z，用softmax归一化：先取指数，然后归一化得到概率：<br><center><img src="/images/294701aa-398f-4536-81ea-8346a172b519.png" width="66%"></center><br> 训练方法类似二分类，最后得到一个3分布的交叉熵：<br><center><img src="/images/3bc82cb2-9972-4508-9a69-29bbbcd0ab84.png" width="66%"></center>
+
+<h3 id="Limitation-of-Logistic-Regression"><a href="#Limitation-of-Logistic-Regression" class="headerlink" title="Limitation of Logistic Regression"></a>Limitation of Logistic Regression</h3><p>像逻辑回归这类的线性模型没法区分出异或操作：</p>
+<center><img src="/images/a7884d28-6985-4246-ab6e-8214a1c8fd19.png" width="66%"></center><br>但是我们<strong>对$\boldsymbol{x}$做一个转换后</strong>，就能分了：<br><center><img src="/images/b2e9d3b0-45f7-49b9-89ba-e902d730fd73.png" width="66%"></center>
+
+<p>但是除非你有邻域知识能后帮助你找到这个转换，如异或例子。大多数非线性场景我们无法直接获得这种转换。<br>怎么办？ 我们可以用LR交叠的方式先获取一个转换，然后在执行分类：</p>
+<center><img src="/images/4ddf7191-97ae-440f-8564-57fc49bd7fc2.png" width="66%"></center>
+
+<p>这就是神经网络了！</p>
+
       
 
       
@@ -212,7 +285,33 @@ var _hmt = _hmt || [];
     <div class="article-info article-info-index">
       
       
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">machine-learning</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Probabilistic-Generative-Model</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
       
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/吴恩达Coursera笔记/" class="article-tag-list-link color4">吴恩达Coursera笔记</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
 
       
 
@@ -276,6 +375,15 @@ var _hmt = _hmt || [];
   
 <nav id="article-nav">
   
+    <a href="/2017/08/31/regularization/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          8 正则化Regularization
+        
+      </div>
+    </a>
+  
   
     <a href="/2017/08/31/pgm/" id="article-nav-older" class="article-nav-link-wrap">
       <div class="article-nav-title">6 Probabilistic Generative Model概率生成模型</div>
@@ -305,7 +413,7 @@ var _hmt = _hmt || [];
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    目录，不存在的…
+                    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#非线性边界"><span class="toc-number">1.</span> <span class="toc-text">非线性边界</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Why-not-Square-Error"><span class="toc-number">2.</span> <span class="toc-text">Why not Square Error</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LR-vs-PGM"><span class="toc-number">3.</span> <span class="toc-text">LR vs PGM</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#多类与softmax"><span class="toc-number">4.</span> <span class="toc-text">多类与softmax</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Limitation-of-Logistic-Regression"><span class="toc-number">5.</span> <span class="toc-text">Limitation of Logistic Regression</span></a></li></ol>
                     </div>
                 </span>
             </div>
@@ -456,19 +564,11 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">gradient-descent</a>
+                <a href="javascript:void(0)" class="js-tag color5">classification</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">linear-regression</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Probabilistic-Generative-Model</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">classification</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -481,6 +581,18 @@ MathJax.Hub.Queue(function() {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">poor conditioning</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">gradient-descent</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Probabilistic-Generative-Model</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">regularization</a>
               </li>
              
               <li class="article-tag-list-item">
