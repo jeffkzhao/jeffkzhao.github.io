@@ -176,7 +176,7 @@ var _hmt = _hmt || [];
       
         <p><strong>正则化的目的就是把曲线拉得缓和些。</strong></p>
 <h2 id="过拟合high-variance"><a href="#过拟合high-variance" class="headerlink" title="过拟合high variance"></a>过拟合high variance</h2><p>我们可能有很多的特征，训练出来的模型和训练集拟合的也非常好，但对新数据的预测却不准，这有可以就是<strong>过拟合</strong>.</p>
-<center><img src="/images/28612cc6-cbd4-4580-8870-841bc14b3fc8.jpg" width="66%"></center><br>-    上面分别是： <strong>线性/欠拟合；二次/恰当；4次/过拟合</strong><br>-    但不是说用的4次就没有二次好，<strong>而是次数越多，θ 值会变得非常大以达到能拟合训练集的目的，曲线的震荡幅度也会非常大</strong>。<br>-    <strong>我们需要曲线平滑些，需要一些regulated校准。</strong><br><br>### Logistic Rgression逻辑回归中的过拟合<br>-    <strong>左图欠拟合：high bias: low polynomial</strong><br>-    <strong>中间quadratic fit</strong><br>-    <strong>右图    high polynomial    过拟合: high variance</strong><br><br><center><img src="/images/d48cd338-0014-4809-9e68-dfb9cc3ebc1b.png" width="66%"></center>
+<center><img src="/images/28612cc6-cbd4-4580-8870-841bc14b3fc8.jpg" width="80%"></center><br>-    上面分别是： <strong>线性/欠拟合；二次/恰当；4次/过拟合</strong><br>-    但不是说用的4次就没有二次好，<strong>而是次数越多，θ 值会变得非常大以达到能拟合训练集的目的，曲线的震荡幅度也会非常大</strong>。<br>-    <strong>我们需要曲线平滑些，需要一些regulated校准。</strong><br><br>### Logistic Rgression逻辑回归中的过拟合<br>-    <strong>左图欠拟合：high bias: low polynomial</strong><br>-    <strong>中间quadratic fit</strong><br>-    <strong>右图    high polynomial    过拟合: high variance</strong><br><br><center><img src="/images/d48cd338-0014-4809-9e68-dfb9cc3ebc1b.png" width="80%"></center>
 
 <h3 id="如何应对过拟合？"><a href="#如何应对过拟合？" class="headerlink" title="如何应对过拟合？"></a>如何应对过拟合？</h3><p>xxxx</p>
 <ul>
@@ -191,7 +191,7 @@ var _hmt = _hmt || [];
 </ul>
 </li>
 </ul>
-<center><img src="/images/" width="66%"></center>
+<center><img src="/images/" width="80%"></center>
 
 <h2 id="正则化代价函数（REGULARIZATION-COST-FUNCTION）"><a href="#正则化代价函数（REGULARIZATION-COST-FUNCTION）" class="headerlink" title="正则化代价函数（REGULARIZATION COST FUNCTION）"></a>正则化代价函数（REGULARIZATION COST FUNCTION）</h2><p>以上面4次方回归为例：</p>
 <p>$$h_{\theta}(\boldsymbol{x}) = \theta_0 + \theta_1 x_1 + \theta_2 x_2^2 + \theta_3 x_3^3 +\theta_4 x_4^4$$</p>
@@ -222,7 +222,7 @@ var _hmt = _hmt || [];
 </ul>
 </li>
 </ul>
-<center><img src="/images/19d9056a-39da-4983-ab4f-11ab1e406086.png" width="66%"></center>
+<center><img src="/images/19d9056a-39da-4983-ab4f-11ab1e406086.png" width="80%"></center>
 
 <ul>
 <li><strong>$\lamda$ 有自动选择的算法，后面会讲。</strong></li>
@@ -238,7 +238,7 @@ var _hmt = _hmt || [];
 <ul>
 <li>对于$j=1,2,…,n$ 时的更新式子 重写一下，看得更明白：</li>
 </ul>
-<center><img src="/images/1e0a240b-3a36-4205-865a-842c4d0e8f5a.png" width="66%"></center>
+<center><img src="/images/1e0a240b-3a36-4205-865a-842c4d0e8f5a.png" width="80%"></center>
 
 <p>变化在于，每次<strong>都在原有算法更新规则的基础上令$\theta_j$值减少了一个额外的值</strong>（$\theta_j$的系数是一个常数，所以每次都要减小一点）：<strong>造成$\theta_j$变的更小，影响也就更小了。</strong></p>
 <ul>
@@ -248,14 +248,14 @@ var _hmt = _hmt || [];
 <li><p>上式中的矩阵尺寸为$(n+1)\times (n+1)$。</p>
 </li>
 </ul>
-<h2 id="正则化逻辑回归（REGULARIZED-LOGISTIC-REGRESSION）"><a href="#正则化逻辑回归（REGULARIZED-LOGISTIC-REGRESSION）" class="headerlink" title="正则化逻辑回归（REGULARIZED LOGISTIC REGRESSION）"></a>正则化逻辑回归（REGULARIZED LOGISTIC REGRESSION）</h2><center><img src="/images/f0af4f80-3e3b-4f5f-a9a3-beb93983bf97.png" width="66%"></center><br>-    对于逻辑回归，我们也给代价函数增加一个正则化的表达式，得到：<br><center><img src="/images/f99bcb87-bb5d-4afd-8b9d-4e8a754964d3.jpg" width="66%"></center>
+<h2 id="正则化逻辑回归（REGULARIZED-LOGISTIC-REGRESSION）"><a href="#正则化逻辑回归（REGULARIZED-LOGISTIC-REGRESSION）" class="headerlink" title="正则化逻辑回归（REGULARIZED LOGISTIC REGRESSION）"></a>正则化逻辑回归（REGULARIZED LOGISTIC REGRESSION）</h2><center><img src="/images/f0af4f80-3e3b-4f5f-a9a3-beb93983bf97.png" width="80%"></center><br>-    对于逻辑回归，我们也给代价函数增加一个正则化的表达式，得到：<br><center><img src="/images/f99bcb87-bb5d-4afd-8b9d-4e8a754964d3.jpg" width="80%"></center>
 
 <ul>
 <li><p>类似，最小化该代价函数，求导，<strong>注意区分$\theta_0$</strong>：</p>
-<center><img src="/images/4b17a42f-8481-46a4-9e3c-870f29712e90.png" width="66%"></center>
+<center><img src="/images/4b17a42f-8481-46a4-9e3c-870f29712e90.png" width="80%"></center>
 </li>
 <li><p>得出梯度下降算法为：</p>
-<center><img src="/images/89e48f2f-4ea5-4204-924d-72f5389f3937.png" width="66%"></center>
+<center><img src="/images/89e48f2f-4ea5-4204-924d-72f5389f3937.png" width="50%"></center>
 </li>
 <li><p>看上去同线性回正则样，<strong>但是知道$h_{\theta}(x) = \sigma (\theta ^{\mathrm{\top}}\boldsymbol{X})$，所以与线性回归不同。</strong></p>
 </li>
