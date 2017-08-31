@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[4 多项式回归]]></title>
+    <url>%2F2017%2F08%2F31%2FpolynomialRegression%2F</url>
+    <content type="text"><![CDATA[前面提到的线性回归，但实际上很多问题是不能用一根直线来区分的。有时需要曲线来拟合我们的数据，那么这是我们就可以考虑多项式回归。比如一个二次方模型quadratic model：$$h_{\theta}(x) = \theta_0 + \theta_1 x + \theta_2 x^2 $$ 或 三次方模型 cube function：$$h_{\theta}(x) = \theta_0 + \theta_1 x + \theta_2 x^2 + \theta_3 x^3 $$ 拟合效果如下： 上例中，只有一个feature即size，对该参数实行多项式计算；注意，quadratic model最后会下行，而cube function 最后会上行。 其实还可以用另一个模型，拟合的更好： $h_{\theta}(x) = \theta_0 + \theta_1 x + \theta_2 x^{\frac{1}{2}} $. 通常我们要观察数据( 图形是一个直观的观察方式 )，然后才能决定用什么样的模型。 这里面也要考虑特征feature的选择:洞察问题，选择最佳的features。 有时还需要对特征进行组合：若原始feature是房屋的长，宽，这显然不是很好的特征，把他们组合新生成一个特征：面积。 注意：我们采用多项式回归模型，在运行梯度下降算法前，特征缩放非常有必要。 正规方程normal equation 某些情况，能够直接求解”最佳”$\theta$ 前面我们一直用梯度下降法找到使cost function 最小化的参数。 对于线性回归等(凸问题，存在全局最优解)，用正规方程normal equation能直接得出答案，即直接求解导数为0的值下式：$$\frac{\partial}{\partial \theta_j} J(\theta_j) = 0$$ 对于训练集特征矩阵为$\boldsymbol{X}$（包含了$\boldsymbol{x}_0=1$）， 得到的解向量为:$$\theta = (\boldsymbol{X}^{\mathrm{\top}} \times \boldsymbol{X})^{-1} \times \boldsymbol{X}^{\mathrm{\top}} \times \boldsymbol{y}$$ 对于不可逆矩阵(如feature间相关，或者特征数大于训练集数等)，正规方程不能用。 梯度下降与正规方程的比较：]]></content>
+      <categories>
+        <category>吴恩达Coursera笔记</category>
+      </categories>
+      <tags>
+        <tag>machine-learning</tag>
+        <tag>linear-regression</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[3 多变量线性回归]]></title>
     <url>%2F2017%2F08%2F30%2FlinearRegressionWithMultiVariable%2F</url>
     <content type="text"><![CDATA[实际应用场景中一般都是多个features特征，例如房间数，楼层等，构成一个多变量的模型，模型中的特征为$（x_1,x_2,…,x_n）$： $n$ 特征的数量 $\boldsymbol{x}^{(i)}$ 第$i$个训练实例，是特征矩阵中的第$i$行，是一个向量（vector）。 $x^{(i)}_j $ 第$i$个训练实例的第$j$个特征，即特征矩阵中第$i$行的第$j$个特征。 多变量线性回归 支持多变量的假设$h$ 为：$$h_{\theta}(x) = \theta_0 + \theta_1 x_1 \theta_2 x_2 + … + \theta_n x_n$$ 有 $n+1$ 个参数和$ n$ 个变量，为了方便处理，引入$x_0 = 1$，公式转换为: $$h_{\theta}(x) = \theta_0 x_0 + \theta_1 x_1 \theta_2 x_2 + … + \theta_n x_n$$ 这样，参数 $n+1$ 维的向量，训练实例也是一个$n+1$ 维向量，我们就可以直接用矩阵操作了。 特征矩阵(训练实例) 维度是 $m×(n+1)$, 公式也就简化为： $$h_{\theta} (\boldsymbol{X}) = \theta ^\mathrm{\top} \boldsymbol{X}$$ 多变量梯度下降gradient Descent for multiple variables与单变量梯度下降相似，构造损失函数： $$J(\theta_0 , \theta_1 ,…,\theta_n) = \frac{1}{2m} \sum^m_{i=1}(h_{\theta} (x^{(i)}) - y^{(i)})^2$$ 对$\theta_i$的参数求导，批量梯度下降，直到收敛： 求导后，代入： 计算过程是先随机选取一系列参数值，然后计算预测结果，代入上式，更新参数值，直到参数收敛。这里会遇到一些问题，一个是不同参数的尺度问题，还有的学习率问题，下面的2个tricks可以帮助解决这些问题： 特征缩放 Feature Scaling以上面的房价预测为例，房间数为0-5，尺寸是0-2000平方英尺，这样画出来的等高线是一个很长的椭圆，需要很多次迭代才能收敛： 为了使收敛速度更快（另外不同的数据级在其他的算法中可能需要一起操作，大级别的参数会覆盖小级别参数的变化），我们要保证这些特征具有相似的尺度similar scale，可以帮助梯度更快的收敛： 解决的方法是尝试将参数的范围放大[-1, 1]间，最简单的方法是：$$x_n=\frac{x_n - \mu_n}{S_n}$$ 其中 $\mu_n$ 是平均值，$S_n$是 标准差。 简单的说就是这个：$$x^*_i=\frac{x_i - \bar{x}}{x_{max} - x_{min}}$$ 特征缩放也称为： Normalization 归一化 学习率learning rate 收敛所需要的迭代次数根据模型不同而不同，可以用迭代次数与代价函数的图标来感官的查看： 代价函数应该在每次迭代后都应该有所减少，直到收敛，上图最后的浅蓝部分就收敛的不错了。 学习率过小，迭代次数太多，学习率太大，可能会错过局部最小值，通常考虑下面的学习率： 0.01，0.03，0.1，0.3，1，3， 10]]></content>

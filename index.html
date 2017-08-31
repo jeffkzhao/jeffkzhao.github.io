@@ -154,6 +154,123 @@ var _hmt = _hmt || [];
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-polynomialRegression" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/08/31/polynomialRegression/">4 多项式回归</a>
+    </h1>
+  
+
+        
+        <a href="/2017/08/31/polynomialRegression/" class="archive-article-date">
+  	<time datetime="2017-08-31T00:37:34.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-31</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>前面提到的线性回归，但实际上很多问题是不能用一根直线来区分的。<br>有时<strong>需要曲线来拟合我们的数据</strong>，那么这是我们就可以考虑多项式回归。<br>比如一个二次方模型quadratic model：<br>$$h_{\theta}(x) = \theta_0 + \theta_1 x + \theta_2 x^2 $$</p>
+<p>或 三次方模型 cube function：<br>$$h_{\theta}(x) = \theta_0 + \theta_1 x + \theta_2 x^2 + \theta_3 x^3 $$</p>
+<p>拟合效果如下：</p>
+<p><img src="/images/792c3f37-8bab-4937-90d3-09d84add73e3.jpg" width="50%"> </p>
+<ul>
+<li>上例中，只有一个feature即size，对该参数实行多项式计算；注意，<strong>quadratic model最后会下行，而cube function 最后会上行</strong>。</li>
+<li><p>其实还可以用另一个模型，拟合的更好： $h_{\theta}(x) = \theta_0 + \theta_1 x + \theta_2 x^{\frac{1}{2}}  $.</p>
+</li>
+<li><p>通常我们<strong>要观察数据( 图形是一个直观的观察方式 )，然后才能决定用什么样的模型。</strong></p>
+</li>
+<li><p>这里面也要考虑特征feature的选择:<strong>洞察问题，选择最佳的features。</strong></p>
+<ul>
+<li>有时还需要对特征进行组合：若原始feature是房屋的长，宽，这显然不是很好的特征，把他们组合新生成一个特征：面积。</li>
+</ul>
+</li>
+<li><p>注意：我们采用<strong>多项式回归模型，在运行梯度下降算法前，特征缩放非常有必要。</strong></p>
+</li>
+</ul>
+<h3 id="正规方程normal-equation"><a href="#正规方程normal-equation" class="headerlink" title="正规方程normal equation"></a>正规方程normal equation</h3><ul>
+<li><strong>某些情况，能够直接求解”最佳”$\theta$</strong></li>
+<li>前面我们一直用梯度下降法找到使cost function 最小化的参数。</li>
+<li><strong>对于线性回归等(凸问题，存在全局最优解)，用正规方程normal equation能直接得出答案</strong>，即直接求解导数为0的值下式：<br>$$\frac{\partial}{\partial \theta_j} J(\theta_j) = 0$$</li>
+</ul>
+<p>对于训练集特征矩阵为$\boldsymbol{X}$（包含了$\boldsymbol{x}_0=1$）， 得到的解向量为:<br>$$\theta = (\boldsymbol{X}^{\mathrm{\top}} \times \boldsymbol{X})^{-1} \times \boldsymbol{X}^{\mathrm{\top}} \times \boldsymbol{y}$$</p>
+<ul>
+<li><strong>对于不可逆矩阵(如feature间相关，或者特征数大于训练集数等)，正规方程不能用。</strong></li>
+<li>梯度下降与正规方程的比较：</li>
+</ul>
+<p><img src="/images/b0668c09-0552-45e3-bfb4-5811f02582b4.png" width="50%"> </p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">machine-learning</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">linear-regression</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/吴恩达Coursera笔记/" class="article-tag-list-link color4">吴恩达Coursera笔记</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/08/31/polynomialRegression/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-linearRegressionWithMultiVariable" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -896,10 +1013,6 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">gradient-descent</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">数值计算</a>
               </li>
              
@@ -909,6 +1022,10 @@ MathJax.Hub.Queue(function() {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">poor conditioning</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">gradient-descent</a>
               </li>
              
               <li class="article-tag-list-item">
