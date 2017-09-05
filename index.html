@@ -180,48 +180,53 @@ var _hmt = _hmt || [];
 
 
 <h3 id="BackPropagation-1"><a href="#BackPropagation-1" class="headerlink" title="BackPropagation"></a>BackPropagation</h3><p>看一下我们要计算的梯度形式，每一个训练样本的损失函数为$l^n$，最终的损失函数$L(\theta )$ 是所有训练样本的summation。目标是求对不同$w$的梯度：</p>
-<center><img src="/images/0.9688997196214963.png" width="66%"></center>
+<center><img src="/images/0.9688997196214963.png" width="50%"></center>
 
 <p>因为神经网络有很多层，那么我们就必须用chain rule一步一步的计算。$L(\theta )$是$l^n$的summation，所以我们只关注单个$l^i$就可以了。<br>先尝试从前往后计算，考虑二维的简单网络，我们求偏导数$\frac{\partial l}{\partial w}$:</p>
-<center><img src="/images/0.5922092281785831.png" width="66%"></center>
+<center><img src="/images/0.5922092281785831.png" width="50%"></center>
 
 <p><strong>$\frac{\partial z}{\partial w}$ 很明显，就是对应的输入值</strong>，那么我们只需要将不同层neurons的输出值计算出来就可以了。<br> 重点在第二部分<strong>$\frac{\partial l}{\partial z}$ </strong>，我们再用一次chain rull：</p>
-<center><img src="/images/0.5575071618765384.png" width="66%"></center>
+<center><img src="/images/0.5575071618765384.png" width="50%"></center>
 
 <p> $\frac{\partial a}{\partial z} = {\sigma}’ (z)$，这个也好计算。接下来我们就要计算$\frac{\partial l}{\partial a}$。这里记住$l$是神经网络最后计算结果$y$的函数，还是需要用chain rull计算偏导数:</p>
-<center><img src="/images/0.01608216830616671.png" width="66%"></center><br><center><img src="/images/0.47019990547383617.png" width="50%"></center>
+<center><img src="/images/0.01608216830616671.png" width="50%"></center><br><center><img src="/images/0.47019990547383617.png" width="39%"></center>
 
 
 <p> <strong>$\frac{\partial l}{\partial z}$ 是下一层 $\frac{\partial l}{\partial z}$的加权summation</strong>。我们就需要这样递归的一步一步计算下去，直到输出层，才能得到该层的 $\frac{\partial l}{\partial z}$。</p>
 <ul>
 <li>最后一层的 $\frac{\partial l}{\partial z} = \frac{\partial l}{\partial y} \frac{\partial y}{\partial z}$，这两项都是可以直接计算出来的，递归终止。</li>
 </ul>
-<p>很明显， $\frac{\partial l}{\partial z}$依赖于后层的 $\frac{\partial l}{\partial z}$，我们应该从最后一层反过来计算 $\frac{\partial l}{\partial z}$，这样从后往前计算所有的 $\frac{\partial l}{\partial z}$就简单直观多了，这就是<strong>backpropagation</strong>。<br>总结一下，用gradient descent优化神经网络，重点是如何计算梯度$\frac{\partial l}{\partial w}$。使用train rule分解为两部分$\frac{\partial z}{\partial w} \times \frac{\partial l}{\partial z}$ ：前半部分也就是前一层的神经元输出（第一层就是输入值）在forward pass 阶段计算；后一部分从最后一层开始，逐层往前计算$\frac{\partial l}{\partial z}$：</p>
-<center><img src="/images/38156580.png" width="66%"></center>
+<p>$\frac{\partial l}{\partial z}$依赖于后层的 $\frac{\partial l}{\partial z}$。显然我们应该从最后一层反过来计算 $\frac{\partial l}{\partial z}$，因为从后往前计算所有的 $\frac{\partial l}{\partial z}$简单直观多了，这就是<strong>backpropagation</strong>。<br>总结一下，用gradient descent优化神经网络，重点是如何计算梯度$\frac{\partial l}{\partial w}$。使用train rule分解为两部分$\frac{\partial z}{\partial w} \times \frac{\partial l}{\partial z}$ ：前半部分也就是前一层的神经元输出（第一层就是输入值）在forward pass 阶段计算；后一部分从最后一层开始，逐层往前计算$\frac{\partial l}{\partial z}$：</p>
+<center><img src="/images/38156580.png" width="50%"></center>
 
 <p>具体的计算流程如下图，上标表示层，下标单数字表示该层排列号，双数字，如$w^l_{ij}$, $i$表示l层中的排列号，$j$表示前一层$l -1$层的排列号 ：</p>
-<center><img src="/images/38156580.png" width="66%"></center><br><center><img src="/images/38108354.png" width="50%"></center>
+<center><img src="/images/38156580.png" width="50%"></center><br><center><img src="/images/38108354.png" width="36%"></center>
 
-<p>稍复杂是在bp中的这个迭代，$\frac{\partial C}{\partial z^l} = \frac{\partial a^l}{\partial z^l} \frac{\partial C}{\partial a^l}  = {\sigma}’ (z^l)\frac{\partial C}{\partial a^l} =  {\sigma}’ (z^l) \frac{\partial z^{l + 1}}{\partial a^l}\frac{\partial C}{\partial z^{l + 1}} = {\sigma}’ (z^l) \left({W^{l + 1}} \right) ^\mathrm{\top} \frac{\partial C}{\partial z^{l + 1}} $. 最后这个组合${W^{l + 1}}^\mathrm{\top} \frac{\partial C}{\partial z^{l + 1}}$实际上就是前面讲到的下一层权重与偏导数的summation，只不过这地方用矩阵乘法的方式计算，转置是因为我们定义的$W$下一层作为横轴，所有要转一下。最后得到的$\frac{\partial C}{\partial z^l}$是一个vector。</p>
+<p>稍复杂的地方是bp中的这个迭代过程：$\frac{\partial C}{\partial z^l} = \frac{\partial a^l}{\partial z^l} \frac{\partial C}{\partial a^l}  = {\sigma}’ (z^l)\frac{\partial C}{\partial a^l} =  {\sigma}’ (z^l) \frac{\partial z^{l + 1}}{\partial a^l}\frac{\partial C}{\partial z^{l + 1}} = {\sigma}’ (z^l) \left({W^{l + 1}} \right) ^\mathrm{\top} \frac{\partial C}{\partial z^{l + 1}} $. 最后这个组合$\left( {W^{l + 1}} \right) ^\mathrm{\top} \frac{\partial C}{\partial z^{l + 1}}$实际上就是前面讲到的下一层权重与偏导数的summation，只不过这地方用矩阵乘法的方式计算。转置是因为我们定义的$W$下一层作为横轴，所有要转一下。最后得到的$\frac{\partial C}{\partial z^l}$是一个vector。</p>
 <h3 id="BP的计算图解释"><a href="#BP的计算图解释" class="headerlink" title="BP的计算图解释"></a>BP的计算图解释</h3><p>还可以用计算图的方法解释BP的过程。计算图computational Graph是一种描述function的形式，<strong>node</strong>代表变量(scalar，vector，tensor…), <strong>edge</strong>代表操作，如函数$e = (a+b) \times (b + 1)$用计算图表示：</p>
-<center><img src="/images/38535751.png" width="66%"></center>
+<center><img src="/images/38535751.png" width="50%"></center>
 
 <h4 id="全联接网络的计算图表示"><a href="#全联接网络的计算图表示" class="headerlink" title="全联接网络的计算图表示"></a>全联接网络的计算图表示</h4><p>我们以一个两层神经网络为例：</p>
-<center><img src="/images/38608912.png" width="66%"></center>
+<center><img src="/images/38608912.png" width="50%"></center>
 
 <p>梯度的BP计算过程我们使用计算图来完成：</p>
-<center><img src="/images/38769187.png" width="66%"></center><br>我们需要从最后一层开始逐层往前计算偏导数。<strong>vector$\boldsymbol{y}$对vector$\boldsymbol{x}$的偏导数是一个Jacobian Matrix，高度是y的维度，宽度是x的维度</strong>。<br>下面还是以MNIST计算为例。<br>-    1 求$\frac{\partial C }{\partial y}$, $C$采用corss entropy，即$C = -log y_r$。由于$C$是一个scalar，所以结果是大小为 $1 \times len(y)$的matrix。$r$是真实值$\hat{y}$中1的位置，该位置$\frac{\partial C }{\partial y_{r = i} }= 0$，其他$\frac{\partial C }{\partial y_i }= 0$:<br><center><img src="/images/39550959.png" width="66%"></center><br>-    2 接着求$\frac{\partial y }{\partial z^2}$。这里激活函数使用sigmod。$\frac{\partial y }{\partial z^2}$结果是一个Jacobian Matrix，由于y就是该层neurons的输出，每个y对应一个neuron，即$y_i = \sigma (z^2_i)$。那么这个matrix只用$i = j$ 处才值，其他地方偏导为0，既是一个diagonal matrix：<br><center><img src="/images/40337673.png" width="66%"></center>
-
-<p>注意若激活函数是softmax，就不是diagonal matrix了，因为每个z都对y由贡献。</p>
-<center><img src="/images/40597329.png" width="66%"></center><br>-    3 接下来就是求$\frac{\partial z^2 }{\partial a^1}$,同样也是一个Jacobian matrix，偏导就是对应的权重值，整个matrix就是$W^2$:<br><center><img src="/images/" width="66%"></center>
+<center><img src="/images/38769187.png" width="50%"></center><br>我们需要从最后一层开始逐层往前计算偏导数。<strong>vector$\boldsymbol{y}$对vector$\boldsymbol{x}$的偏导数是一个Jacobian Matrix，高度是y的维度，宽度是x的维度</strong>。<br>下面还是以MNIST计算为例。<br><br>-    求$\frac{\partial C }{\partial y}$, $C$采用corss entropy，即$C = -log y_r$。由于$C$是一个scalar，所以结果是大小为 $1 \times len(y)$的matrix。$r$是真实值$\hat{y}$中1的位置，该位置$\frac{\partial C }{\partial y_{r = i} }= 0$，其他$\frac{\partial C }{\partial y_i }= 0$:<br><center><img src="/images/39550959.png" width="50%"></center>
 
 <ul>
-<li>4 求$\frac{\partial z^2 }{\partial W^2}$，$W^2$是一个matrix，结构如下：</li>
-</ul>
-<center><img src="/images/41293078.png" width="66%"></center>
+<li>接着求$\frac{\partial y }{\partial z^2}$。这里激活函数使用sigmod。$\frac{\partial y }{\partial z^2}$结果是一个Jacobian Matrix，由于y就是该层neurons的输出，每个y对应一个neuron，即$y_i = \sigma (z^2_i)$。那么这个matrix只用$i = j$ 处才值，其他地方偏导为0，既是一个diagonal matrix：<center><img src="/images/40337673.png" width="50%"></center>
 
-<p>$z^l_i$只有计算该值的$w^{l }_{ij}}$相关，如下图，所以最后的结果是一个类diagonal mtrix,值为$a^{l -1}$ :</p>
-<center><img src="/images/41265687.png" width="66%"></center><br>最后我们要求$\frac{\partial C }{\partial W^1}$，就是将路径上的所有偏导乘起来就可以了，注意最后结果的维度, 高度为1，宽度为$m \times n$:<br><center><img src="/images/41620488.png" width="66%"></center>
+</li>
+</ul>
+<p>注意若激活函数是softmax，就不是diagonal matrix了，因为每个z都对y由贡献。</p>
+<center><img src="/images/40597329.png" width="50%"></center><br>-   接下来就是求$\frac{\partial z^2 }{\partial a^1}$,同样也是一个Jacobian matrix，偏导就是对应的权重值，整个matrix就是$W^2$:<br><center><img src="/images/40597329.png" width="50%"></center>
+
+<ul>
+<li>求$\frac{\partial z^2 }{\partial W^2}$，$W^2$是一个matrix，结构如下：</li>
+</ul>
+<center><img src="/images/41293078.png" width="39%"></center>
+
+<p>$z^l_i$只与计算该值的$w^{l}_{ij}$相关，如下图，所以最后的结果是一个类diagonal mtrix,值为$a^{l -1}$ :</p>
+<center><img src="/images/41265687.png" width="30%"></center><br>最后我们要求$\frac{\partial C }{\partial W^1}$，就是将路径上的所有偏导乘起来就可以了，注意最后结果的维度, 高度为1，宽度为$m \times n$:<br><center><img src="/images/41620488.png" width="50%"></center>
 
 <p>计算图的结果和采用BP是一致的。计算图貌似只使用Backforward过程，但$a$的计算都需要forward progress处理。</p>
 
@@ -748,8 +753,7 @@ var _hmt = _hmt || [];
 <h2 id="过拟合high-variance"><a href="#过拟合high-variance" class="headerlink" title="过拟合high variance"></a>过拟合high variance</h2><p>我们可能有很多的特征，训练出来的模型和训练集拟合的也非常好，但对新数据的预测却不准，这有可以就是<strong>过拟合</strong>.</p>
 <center><img src="/images/28612cc6-cbd4-4580-8870-841bc14b3fc8.jpg" width="80%"></center><br>-    上面分别是： <strong>线性/欠拟合；二次/恰当；4次/过拟合</strong><br>-    但不是说用的4次就没有二次好，<strong>而是次数越多，θ 值会变得非常大以达到能拟合训练集的目的，曲线的震荡幅度也会非常大</strong>。<br>-    <strong>我们需要曲线平滑些，需要一些regulated校准。</strong><br><br>### Logistic Rgression逻辑回归中的过拟合<br>-    <strong>左图欠拟合：high bias: low polynomial</strong><br>-    <strong>中间quadratic fit</strong><br>-    <strong>右图    high polynomial    过拟合: high variance</strong><br><br><center><img src="/images/d48cd338-0014-4809-9e68-dfb9cc3ebc1b.png" width="80%"></center>
 
-<h3 id="如何应对过拟合？"><a href="#如何应对过拟合？" class="headerlink" title="如何应对过拟合？"></a>如何应对过拟合？</h3><p>xxxx</p>
-<ul>
+<h3 id="如何应对过拟合？"><a href="#如何应对过拟合？" class="headerlink" title="如何应对过拟合？"></a>如何应对过拟合？</h3><ul>
 <li><strong>1 减少feature的数量：去除贡献少的features</strong><ul>
 <li>可以手工选择，也可以<strong>使用Model selection algorithms，如PCA</strong></li>
 </ul>
@@ -768,7 +772,7 @@ var _hmt = _hmt || [];
 <ul>
 <li>要<strong>大大减少$\theta_3$和$\theta_4$的大小</strong>，我们要做的便是修改代价函数，在<strong>其中$\theta_3$和$\theta_4$设置一点惩罚</strong>。修改后的代价函数如下：</li>
 </ul>
-<center><img src="/images/210ff50f-b8a6-445a-b782-3aa80afef907.jpg" width="50%"></center>
+<center><img src="/images/210ff50f-b8a6-445a-b782-3aa80afef907.jpg" width="39%"></center>
 
 <ul>
 <li><strong>这样$\theta_3$和$\theta_4$ 的值会很小 (约等于零)，3次方和4次方对最后的结果影响也就小了，模型接近 二次方程 了。</strong></li>
@@ -776,56 +780,56 @@ var _hmt = _hmt || [];
 <ul>
 <li>对于非常多的特征，<strong>并不知道其中哪些特征我们要惩罚</strong>，那么就<strong>对所有的特征进行惩罚</strong>，得到了一个较为简单的能防止过拟合问题的假设：</li>
 </ul>
-<center><img src="/images/b75be66b-5dbd-42e1-9137-dc3215ecc041.jpg" width="50%"></center>
+<center><img src="/images/b75be66b-5dbd-42e1-9137-dc3215ecc041.jpg" width="39%"></center>
 
 
 <ul>
-<li><strong>$\lamda$        正则化参数（Regularization Parameter）</strong></li>
+<li><strong>$\lambda$        正则化参数（Regularization Parameter）</strong></li>
 <li><strong>注意：根据惯例，我们不对θ0进行惩罚。</strong></li>
 </ul>
 <center><img src="/images/f1418194-7cb5-4216-8a09-4b864494f2a4.jpg" width="40%"></center>
 
 <ul>
-<li><strong> $\lamda$ 越大，惩罚越重    </strong></li>
-<li><strong>$\lamda$太大也不行，就欠拟合了：</strong><ul>
-<li>$\lamda=10^10$ ，除了$\theta_0$，其他的$\theta$都接近零了，这样hypothesis 就成了找最合适的一个水平线：$h_{\theta}(x) = \theta_0$：显然，欠拟合了。</li>
+<li><strong> $\lambda$ 越大，惩罚越重    </strong></li>
+<li><strong>$\lambda$太大也不行，就欠拟合了：</strong><ul>
+<li>$\lambda=10^10$ ，除了$\theta_0$，其他的$\theta$都接近零了，这样hypothesis 就成了找最合适的一个水平线：$h_{\theta}(x) = \theta_0$：显然，欠拟合了。</li>
 </ul>
 </li>
 </ul>
 <center><img src="/images/19d9056a-39da-4983-ab4f-11ab1e406086.png" width="80%"></center>
 
 <ul>
-<li><strong>$\lamda$ 有自动选择的算法，后面会讲。</strong></li>
+<li><strong>$\lambda$ 有自动选择的算法，后面会讲。</strong></li>
 </ul>
 <h3 id="正则化线性回归（REGULARIZED-LINEAR-REGRESSION）"><a href="#正则化线性回归（REGULARIZED-LINEAR-REGRESSION）" class="headerlink" title="正则化线性回归（REGULARIZED LINEAR REGRESSION）"></a>正则化线性回归（REGULARIZED LINEAR REGRESSION）</h3><p> 正则化线性回归的代价函数为：</p>
- <center><img src="/images/54fa160c-c714-4b9c-8be9-1821936630c4.jpg" width="50%"></center>   
+<center><img src="/images/54fa160c-c714-4b9c-8be9-1821936630c4.jpg" width="36%"></center>   
 
 <ul>
 <li><strong>因为没有对$\theta_0$正则化，所以分开处理：</strong></li>
 </ul>
-<center><img src="/images/1607b830-e06e-42fd-a602-5507f7881296.jpg" width="50%"></center>
+<center><img src="/images/1607b830-e06e-42fd-a602-5507f7881296.jpg" width="39%"></center>
 
 <ul>
 <li>对于$j=1,2,…,n$ 时的更新式子 重写一下，看得更明白：</li>
 </ul>
-<center><img src="/images/1e0a240b-3a36-4205-865a-842c4d0e8f5a.png" width="80%"></center>
+<center><img src="/images/1e0a240b-3a36-4205-865a-842c4d0e8f5a.png" width="50%"></center>
 
 <p>变化在于，每次<strong>都在原有算法更新规则的基础上令$\theta_j$值减少了一个额外的值</strong>（$\theta_j$的系数是一个常数，所以每次都要减小一点）：<strong>造成$\theta_j$变的更小，影响也就更小了。</strong></p>
 <ul>
 <li><p>也可以利用<strong>正规方程来求解正则化线性回归模型</strong>，方法如下所示</p>
-<center><img src="/images/4d686251-40ee-4c59-84d4-064901b637a1.png" width="50%"></center>
+<center><img src="/images/4d686251-40ee-4c59-84d4-064901b637a1.png" width="39%"></center>
 </li>
 <li><p>上式中的矩阵尺寸为$(n+1)\times (n+1)$。</p>
 </li>
 </ul>
-<h2 id="正则化逻辑回归（REGULARIZED-LOGISTIC-REGRESSION）"><a href="#正则化逻辑回归（REGULARIZED-LOGISTIC-REGRESSION）" class="headerlink" title="正则化逻辑回归（REGULARIZED LOGISTIC REGRESSION）"></a>正则化逻辑回归（REGULARIZED LOGISTIC REGRESSION）</h2><center><img src="/images/f0af4f80-3e3b-4f5f-a9a3-beb93983bf97.png" width="80%"></center><br>-    对于逻辑回归，我们也给代价函数增加一个正则化的表达式，得到：<br><center><img src="/images/f99bcb87-bb5d-4afd-8b9d-4e8a754964d3.jpg" width="80%"></center>
+<h2 id="正则化逻辑回归（REGULARIZED-LOGISTIC-REGRESSION）"><a href="#正则化逻辑回归（REGULARIZED-LOGISTIC-REGRESSION）" class="headerlink" title="正则化逻辑回归（REGULARIZED LOGISTIC REGRESSION）"></a>正则化逻辑回归（REGULARIZED LOGISTIC REGRESSION）</h2><center><img src="/images/f0af4f80-3e3b-4f5f-a9a3-beb93983bf97.png" width="60%"></center><br>-    对于逻辑回归，我们也给代价函数增加一个正则化的表达式，得到：<br><center><img src="/images/f99bcb87-bb5d-4afd-8b9d-4e8a754964d3.jpg" width="60%"></center>
 
 <ul>
 <li><p>类似，最小化该代价函数，求导，<strong>注意区分$\theta_0$</strong>：</p>
-<center><img src="/images/4b17a42f-8481-46a4-9e3c-870f29712e90.png" width="80%"></center>
+<center><img src="/images/4b17a42f-8481-46a4-9e3c-870f29712e90.png" width="60%"></center>
 </li>
 <li><p>得出梯度下降算法为：</p>
-<center><img src="/images/89e48f2f-4ea5-4204-924d-72f5389f3937.png" width="50%"></center>
+<center><img src="/images/89e48f2f-4ea5-4204-924d-72f5389f3937.png" width="39%"></center>
 </li>
 <li><p>看上去同线性回正则样，<strong>但是知道$h_{\theta}(x) = \sigma (\theta ^{\mathrm{\top}}\boldsymbol{X})$，所以与线性回归不同。</strong></p>
 </li>

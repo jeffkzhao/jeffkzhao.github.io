@@ -31,7 +31,7 @@
 <meta property="og:image" content="/images/f99bcb87-bb5d-4afd-8b9d-4e8a754964d3.jpg">
 <meta property="og:image" content="/images/4b17a42f-8481-46a4-9e3c-870f29712e90.png">
 <meta property="og:image" content="/images/89e48f2f-4ea5-4204-924d-72f5389f3937.png">
-<meta property="og:updated_time" content="2017-08-31T07:39:51.000Z">
+<meta property="og:updated_time" content="2017-09-05T05:05:00.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="8 正则化Regularization">
 <meta name="twitter:description" content="正则化的目的就是把曲线拉得缓和些。 过拟合high variance我们可能有很多的特征，训练出来的模型和训练集拟合的也非常好，但对新数据的预测却不准，这有可以就是过拟合. -    上面分别是： 线性/欠拟合；二次/恰当；4次/过拟合-    但不是说用的4次就没有二次好，而是次数越多，θ 值会变得非常大以达到能拟合训练集的目的，曲线的震荡幅度也会非常大。-    我们需要曲线平滑些，需要一些r">
@@ -197,8 +197,7 @@ var _hmt = _hmt || [];
 <h2 id="过拟合high-variance"><a href="#过拟合high-variance" class="headerlink" title="过拟合high variance"></a>过拟合high variance</h2><p>我们可能有很多的特征，训练出来的模型和训练集拟合的也非常好，但对新数据的预测却不准，这有可以就是<strong>过拟合</strong>.</p>
 <center><img src="/images/28612cc6-cbd4-4580-8870-841bc14b3fc8.jpg" width="80%"></center><br>-    上面分别是： <strong>线性/欠拟合；二次/恰当；4次/过拟合</strong><br>-    但不是说用的4次就没有二次好，<strong>而是次数越多，θ 值会变得非常大以达到能拟合训练集的目的，曲线的震荡幅度也会非常大</strong>。<br>-    <strong>我们需要曲线平滑些，需要一些regulated校准。</strong><br><br>### Logistic Rgression逻辑回归中的过拟合<br>-    <strong>左图欠拟合：high bias: low polynomial</strong><br>-    <strong>中间quadratic fit</strong><br>-    <strong>右图    high polynomial    过拟合: high variance</strong><br><br><center><img src="/images/d48cd338-0014-4809-9e68-dfb9cc3ebc1b.png" width="80%"></center>
 
-<h3 id="如何应对过拟合？"><a href="#如何应对过拟合？" class="headerlink" title="如何应对过拟合？"></a>如何应对过拟合？</h3><p>xxxx</p>
-<ul>
+<h3 id="如何应对过拟合？"><a href="#如何应对过拟合？" class="headerlink" title="如何应对过拟合？"></a>如何应对过拟合？</h3><ul>
 <li><strong>1 减少feature的数量：去除贡献少的features</strong><ul>
 <li>可以手工选择，也可以<strong>使用Model selection algorithms，如PCA</strong></li>
 </ul>
@@ -217,7 +216,7 @@ var _hmt = _hmt || [];
 <ul>
 <li>要<strong>大大减少$\theta_3$和$\theta_4$的大小</strong>，我们要做的便是修改代价函数，在<strong>其中$\theta_3$和$\theta_4$设置一点惩罚</strong>。修改后的代价函数如下：</li>
 </ul>
-<center><img src="/images/210ff50f-b8a6-445a-b782-3aa80afef907.jpg" width="50%"></center>
+<center><img src="/images/210ff50f-b8a6-445a-b782-3aa80afef907.jpg" width="39%"></center>
 
 <ul>
 <li><strong>这样$\theta_3$和$\theta_4$ 的值会很小 (约等于零)，3次方和4次方对最后的结果影响也就小了，模型接近 二次方程 了。</strong></li>
@@ -225,56 +224,56 @@ var _hmt = _hmt || [];
 <ul>
 <li>对于非常多的特征，<strong>并不知道其中哪些特征我们要惩罚</strong>，那么就<strong>对所有的特征进行惩罚</strong>，得到了一个较为简单的能防止过拟合问题的假设：</li>
 </ul>
-<center><img src="/images/b75be66b-5dbd-42e1-9137-dc3215ecc041.jpg" width="50%"></center>
+<center><img src="/images/b75be66b-5dbd-42e1-9137-dc3215ecc041.jpg" width="39%"></center>
 
 
 <ul>
-<li><strong>$\lamda$        正则化参数（Regularization Parameter）</strong></li>
+<li><strong>$\lambda$        正则化参数（Regularization Parameter）</strong></li>
 <li><strong>注意：根据惯例，我们不对θ0进行惩罚。</strong></li>
 </ul>
 <center><img src="/images/f1418194-7cb5-4216-8a09-4b864494f2a4.jpg" width="40%"></center>
 
 <ul>
-<li><strong> $\lamda$ 越大，惩罚越重    </strong></li>
-<li><strong>$\lamda$太大也不行，就欠拟合了：</strong><ul>
-<li>$\lamda=10^10$ ，除了$\theta_0$，其他的$\theta$都接近零了，这样hypothesis 就成了找最合适的一个水平线：$h_{\theta}(x) = \theta_0$：显然，欠拟合了。</li>
+<li><strong> $\lambda$ 越大，惩罚越重    </strong></li>
+<li><strong>$\lambda$太大也不行，就欠拟合了：</strong><ul>
+<li>$\lambda=10^10$ ，除了$\theta_0$，其他的$\theta$都接近零了，这样hypothesis 就成了找最合适的一个水平线：$h_{\theta}(x) = \theta_0$：显然，欠拟合了。</li>
 </ul>
 </li>
 </ul>
 <center><img src="/images/19d9056a-39da-4983-ab4f-11ab1e406086.png" width="80%"></center>
 
 <ul>
-<li><strong>$\lamda$ 有自动选择的算法，后面会讲。</strong></li>
+<li><strong>$\lambda$ 有自动选择的算法，后面会讲。</strong></li>
 </ul>
 <h3 id="正则化线性回归（REGULARIZED-LINEAR-REGRESSION）"><a href="#正则化线性回归（REGULARIZED-LINEAR-REGRESSION）" class="headerlink" title="正则化线性回归（REGULARIZED LINEAR REGRESSION）"></a>正则化线性回归（REGULARIZED LINEAR REGRESSION）</h3><p> 正则化线性回归的代价函数为：</p>
- <center><img src="/images/54fa160c-c714-4b9c-8be9-1821936630c4.jpg" width="50%"></center>   
+<center><img src="/images/54fa160c-c714-4b9c-8be9-1821936630c4.jpg" width="36%"></center>   
 
 <ul>
 <li><strong>因为没有对$\theta_0$正则化，所以分开处理：</strong></li>
 </ul>
-<center><img src="/images/1607b830-e06e-42fd-a602-5507f7881296.jpg" width="50%"></center>
+<center><img src="/images/1607b830-e06e-42fd-a602-5507f7881296.jpg" width="39%"></center>
 
 <ul>
 <li>对于$j=1,2,…,n$ 时的更新式子 重写一下，看得更明白：</li>
 </ul>
-<center><img src="/images/1e0a240b-3a36-4205-865a-842c4d0e8f5a.png" width="80%"></center>
+<center><img src="/images/1e0a240b-3a36-4205-865a-842c4d0e8f5a.png" width="50%"></center>
 
 <p>变化在于，每次<strong>都在原有算法更新规则的基础上令$\theta_j$值减少了一个额外的值</strong>（$\theta_j$的系数是一个常数，所以每次都要减小一点）：<strong>造成$\theta_j$变的更小，影响也就更小了。</strong></p>
 <ul>
 <li><p>也可以利用<strong>正规方程来求解正则化线性回归模型</strong>，方法如下所示</p>
-<center><img src="/images/4d686251-40ee-4c59-84d4-064901b637a1.png" width="50%"></center>
+<center><img src="/images/4d686251-40ee-4c59-84d4-064901b637a1.png" width="39%"></center>
 </li>
 <li><p>上式中的矩阵尺寸为$(n+1)\times (n+1)$。</p>
 </li>
 </ul>
-<h2 id="正则化逻辑回归（REGULARIZED-LOGISTIC-REGRESSION）"><a href="#正则化逻辑回归（REGULARIZED-LOGISTIC-REGRESSION）" class="headerlink" title="正则化逻辑回归（REGULARIZED LOGISTIC REGRESSION）"></a>正则化逻辑回归（REGULARIZED LOGISTIC REGRESSION）</h2><center><img src="/images/f0af4f80-3e3b-4f5f-a9a3-beb93983bf97.png" width="80%"></center><br>-    对于逻辑回归，我们也给代价函数增加一个正则化的表达式，得到：<br><center><img src="/images/f99bcb87-bb5d-4afd-8b9d-4e8a754964d3.jpg" width="80%"></center>
+<h2 id="正则化逻辑回归（REGULARIZED-LOGISTIC-REGRESSION）"><a href="#正则化逻辑回归（REGULARIZED-LOGISTIC-REGRESSION）" class="headerlink" title="正则化逻辑回归（REGULARIZED LOGISTIC REGRESSION）"></a>正则化逻辑回归（REGULARIZED LOGISTIC REGRESSION）</h2><center><img src="/images/f0af4f80-3e3b-4f5f-a9a3-beb93983bf97.png" width="60%"></center><br>-    对于逻辑回归，我们也给代价函数增加一个正则化的表达式，得到：<br><center><img src="/images/f99bcb87-bb5d-4afd-8b9d-4e8a754964d3.jpg" width="60%"></center>
 
 <ul>
 <li><p>类似，最小化该代价函数，求导，<strong>注意区分$\theta_0$</strong>：</p>
-<center><img src="/images/4b17a42f-8481-46a4-9e3c-870f29712e90.png" width="80%"></center>
+<center><img src="/images/4b17a42f-8481-46a4-9e3c-870f29712e90.png" width="60%"></center>
 </li>
 <li><p>得出梯度下降算法为：</p>
-<center><img src="/images/89e48f2f-4ea5-4204-924d-72f5389f3937.png" width="50%"></center>
+<center><img src="/images/89e48f2f-4ea5-4204-924d-72f5389f3937.png" width="39%"></center>
 </li>
 <li><p>看上去同线性回正则样，<strong>但是知道$h_{\theta}(x) = \sigma (\theta ^{\mathrm{\top}}\boldsymbol{X})$，所以与线性回归不同。</strong></p>
 </li>

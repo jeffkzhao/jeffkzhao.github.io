@@ -31,11 +31,11 @@
 <meta property="og:image" content="/images/39550959.png">
 <meta property="og:image" content="/images/40337673.png">
 <meta property="og:image" content="/images/40597329.png">
-<meta property="og:image" content="/images/">
+<meta property="og:image" content="/images/40597329.png">
 <meta property="og:image" content="/images/41293078.png">
 <meta property="og:image" content="/images/41265687.png">
 <meta property="og:image" content="/images/41620488.png">
-<meta property="og:updated_time" content="2017-09-05T03:59:53.000Z">
+<meta property="og:updated_time" content="2017-09-05T05:07:22.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="2 反向传播">
 <meta name="twitter:description" content="BackPropagation这部分讲如何高效地计算神经网络中的梯度。 链式法则多元复合函数的求导公式利用了偏导数的链式法则chain rule，注意下面偏导数的表示形式。    BackPropagation看一下我们要计算的梯度形式，每一个训练样本的损失函数为$l^n$，最终的损失函数$L(\theta )$ 是所有训练样本的summation。目标是求对不同$w$的梯度：   因为神经网络有">
@@ -203,48 +203,53 @@ var _hmt = _hmt || [];
 
 
 <h3 id="BackPropagation-1"><a href="#BackPropagation-1" class="headerlink" title="BackPropagation"></a>BackPropagation</h3><p>看一下我们要计算的梯度形式，每一个训练样本的损失函数为$l^n$，最终的损失函数$L(\theta )$ 是所有训练样本的summation。目标是求对不同$w$的梯度：</p>
-<center><img src="/images/0.9688997196214963.png" width="66%"></center>
+<center><img src="/images/0.9688997196214963.png" width="50%"></center>
 
 <p>因为神经网络有很多层，那么我们就必须用chain rule一步一步的计算。$L(\theta )$是$l^n$的summation，所以我们只关注单个$l^i$就可以了。<br>先尝试从前往后计算，考虑二维的简单网络，我们求偏导数$\frac{\partial l}{\partial w}$:</p>
-<center><img src="/images/0.5922092281785831.png" width="66%"></center>
+<center><img src="/images/0.5922092281785831.png" width="50%"></center>
 
 <p><strong>$\frac{\partial z}{\partial w}$ 很明显，就是对应的输入值</strong>，那么我们只需要将不同层neurons的输出值计算出来就可以了。<br> 重点在第二部分<strong>$\frac{\partial l}{\partial z}$ </strong>，我们再用一次chain rull：</p>
-<center><img src="/images/0.5575071618765384.png" width="66%"></center>
+<center><img src="/images/0.5575071618765384.png" width="50%"></center>
 
 <p> $\frac{\partial a}{\partial z} = {\sigma}’ (z)$，这个也好计算。接下来我们就要计算$\frac{\partial l}{\partial a}$。这里记住$l$是神经网络最后计算结果$y$的函数，还是需要用chain rull计算偏导数:</p>
-<center><img src="/images/0.01608216830616671.png" width="66%"></center><br><center><img src="/images/0.47019990547383617.png" width="50%"></center>
+<center><img src="/images/0.01608216830616671.png" width="50%"></center><br><center><img src="/images/0.47019990547383617.png" width="39%"></center>
 
 
 <p> <strong>$\frac{\partial l}{\partial z}$ 是下一层 $\frac{\partial l}{\partial z}$的加权summation</strong>。我们就需要这样递归的一步一步计算下去，直到输出层，才能得到该层的 $\frac{\partial l}{\partial z}$。</p>
 <ul>
 <li>最后一层的 $\frac{\partial l}{\partial z} = \frac{\partial l}{\partial y} \frac{\partial y}{\partial z}$，这两项都是可以直接计算出来的，递归终止。</li>
 </ul>
-<p>很明显， $\frac{\partial l}{\partial z}$依赖于后层的 $\frac{\partial l}{\partial z}$，我们应该从最后一层反过来计算 $\frac{\partial l}{\partial z}$，这样从后往前计算所有的 $\frac{\partial l}{\partial z}$就简单直观多了，这就是<strong>backpropagation</strong>。<br>总结一下，用gradient descent优化神经网络，重点是如何计算梯度$\frac{\partial l}{\partial w}$。使用train rule分解为两部分$\frac{\partial z}{\partial w} \times \frac{\partial l}{\partial z}$ ：前半部分也就是前一层的神经元输出（第一层就是输入值）在forward pass 阶段计算；后一部分从最后一层开始，逐层往前计算$\frac{\partial l}{\partial z}$：</p>
-<center><img src="/images/38156580.png" width="66%"></center>
+<p>$\frac{\partial l}{\partial z}$依赖于后层的 $\frac{\partial l}{\partial z}$。显然我们应该从最后一层反过来计算 $\frac{\partial l}{\partial z}$，因为从后往前计算所有的 $\frac{\partial l}{\partial z}$简单直观多了，这就是<strong>backpropagation</strong>。<br>总结一下，用gradient descent优化神经网络，重点是如何计算梯度$\frac{\partial l}{\partial w}$。使用train rule分解为两部分$\frac{\partial z}{\partial w} \times \frac{\partial l}{\partial z}$ ：前半部分也就是前一层的神经元输出（第一层就是输入值）在forward pass 阶段计算；后一部分从最后一层开始，逐层往前计算$\frac{\partial l}{\partial z}$：</p>
+<center><img src="/images/38156580.png" width="50%"></center>
 
 <p>具体的计算流程如下图，上标表示层，下标单数字表示该层排列号，双数字，如$w^l_{ij}$, $i$表示l层中的排列号，$j$表示前一层$l -1$层的排列号 ：</p>
-<center><img src="/images/38156580.png" width="66%"></center><br><center><img src="/images/38108354.png" width="50%"></center>
+<center><img src="/images/38156580.png" width="50%"></center><br><center><img src="/images/38108354.png" width="36%"></center>
 
-<p>稍复杂是在bp中的这个迭代，$\frac{\partial C}{\partial z^l} = \frac{\partial a^l}{\partial z^l} \frac{\partial C}{\partial a^l}  = {\sigma}’ (z^l)\frac{\partial C}{\partial a^l} =  {\sigma}’ (z^l) \frac{\partial z^{l + 1}}{\partial a^l}\frac{\partial C}{\partial z^{l + 1}} = {\sigma}’ (z^l) \left({W^{l + 1}} \right) ^\mathrm{\top} \frac{\partial C}{\partial z^{l + 1}} $. 最后这个组合${W^{l + 1}}^\mathrm{\top} \frac{\partial C}{\partial z^{l + 1}}$实际上就是前面讲到的下一层权重与偏导数的summation，只不过这地方用矩阵乘法的方式计算，转置是因为我们定义的$W$下一层作为横轴，所有要转一下。最后得到的$\frac{\partial C}{\partial z^l}$是一个vector。</p>
+<p>稍复杂的地方是bp中的这个迭代过程：$\frac{\partial C}{\partial z^l} = \frac{\partial a^l}{\partial z^l} \frac{\partial C}{\partial a^l}  = {\sigma}’ (z^l)\frac{\partial C}{\partial a^l} =  {\sigma}’ (z^l) \frac{\partial z^{l + 1}}{\partial a^l}\frac{\partial C}{\partial z^{l + 1}} = {\sigma}’ (z^l) \left({W^{l + 1}} \right) ^\mathrm{\top} \frac{\partial C}{\partial z^{l + 1}} $. 最后这个组合$\left( {W^{l + 1}} \right) ^\mathrm{\top} \frac{\partial C}{\partial z^{l + 1}}$实际上就是前面讲到的下一层权重与偏导数的summation，只不过这地方用矩阵乘法的方式计算。转置是因为我们定义的$W$下一层作为横轴，所有要转一下。最后得到的$\frac{\partial C}{\partial z^l}$是一个vector。</p>
 <h3 id="BP的计算图解释"><a href="#BP的计算图解释" class="headerlink" title="BP的计算图解释"></a>BP的计算图解释</h3><p>还可以用计算图的方法解释BP的过程。计算图computational Graph是一种描述function的形式，<strong>node</strong>代表变量(scalar，vector，tensor…), <strong>edge</strong>代表操作，如函数$e = (a+b) \times (b + 1)$用计算图表示：</p>
-<center><img src="/images/38535751.png" width="66%"></center>
+<center><img src="/images/38535751.png" width="50%"></center>
 
 <h4 id="全联接网络的计算图表示"><a href="#全联接网络的计算图表示" class="headerlink" title="全联接网络的计算图表示"></a>全联接网络的计算图表示</h4><p>我们以一个两层神经网络为例：</p>
-<center><img src="/images/38608912.png" width="66%"></center>
+<center><img src="/images/38608912.png" width="50%"></center>
 
 <p>梯度的BP计算过程我们使用计算图来完成：</p>
-<center><img src="/images/38769187.png" width="66%"></center><br>我们需要从最后一层开始逐层往前计算偏导数。<strong>vector$\boldsymbol{y}$对vector$\boldsymbol{x}$的偏导数是一个Jacobian Matrix，高度是y的维度，宽度是x的维度</strong>。<br>下面还是以MNIST计算为例。<br>-    1 求$\frac{\partial C }{\partial y}$, $C$采用corss entropy，即$C = -log y_r$。由于$C$是一个scalar，所以结果是大小为 $1 \times len(y)$的matrix。$r$是真实值$\hat{y}$中1的位置，该位置$\frac{\partial C }{\partial y_{r = i} }= 0$，其他$\frac{\partial C }{\partial y_i }= 0$:<br><center><img src="/images/39550959.png" width="66%"></center><br>-    2 接着求$\frac{\partial y }{\partial z^2}$。这里激活函数使用sigmod。$\frac{\partial y }{\partial z^2}$结果是一个Jacobian Matrix，由于y就是该层neurons的输出，每个y对应一个neuron，即$y_i = \sigma (z^2_i)$。那么这个matrix只用$i = j$ 处才值，其他地方偏导为0，既是一个diagonal matrix：<br><center><img src="/images/40337673.png" width="66%"></center>
-
-<p>注意若激活函数是softmax，就不是diagonal matrix了，因为每个z都对y由贡献。</p>
-<center><img src="/images/40597329.png" width="66%"></center><br>-    3 接下来就是求$\frac{\partial z^2 }{\partial a^1}$,同样也是一个Jacobian matrix，偏导就是对应的权重值，整个matrix就是$W^2$:<br><center><img src="/images/" width="66%"></center>
+<center><img src="/images/38769187.png" width="50%"></center><br>我们需要从最后一层开始逐层往前计算偏导数。<strong>vector$\boldsymbol{y}$对vector$\boldsymbol{x}$的偏导数是一个Jacobian Matrix，高度是y的维度，宽度是x的维度</strong>。<br>下面还是以MNIST计算为例。<br><br>-    求$\frac{\partial C }{\partial y}$, $C$采用corss entropy，即$C = -log y_r$。由于$C$是一个scalar，所以结果是大小为 $1 \times len(y)$的matrix。$r$是真实值$\hat{y}$中1的位置，该位置$\frac{\partial C }{\partial y_{r = i} }= 0$，其他$\frac{\partial C }{\partial y_i }= 0$:<br><center><img src="/images/39550959.png" width="50%"></center>
 
 <ul>
-<li>4 求$\frac{\partial z^2 }{\partial W^2}$，$W^2$是一个matrix，结构如下：</li>
-</ul>
-<center><img src="/images/41293078.png" width="66%"></center>
+<li>接着求$\frac{\partial y }{\partial z^2}$。这里激活函数使用sigmod。$\frac{\partial y }{\partial z^2}$结果是一个Jacobian Matrix，由于y就是该层neurons的输出，每个y对应一个neuron，即$y_i = \sigma (z^2_i)$。那么这个matrix只用$i = j$ 处才值，其他地方偏导为0，既是一个diagonal matrix：<center><img src="/images/40337673.png" width="50%"></center>
 
-<p>$z^l_i$只有计算该值的$w^{l }_{ij}}$相关，如下图，所以最后的结果是一个类diagonal mtrix,值为$a^{l -1}$ :</p>
-<center><img src="/images/41265687.png" width="66%"></center><br>最后我们要求$\frac{\partial C }{\partial W^1}$，就是将路径上的所有偏导乘起来就可以了，注意最后结果的维度, 高度为1，宽度为$m \times n$:<br><center><img src="/images/41620488.png" width="66%"></center>
+</li>
+</ul>
+<p>注意若激活函数是softmax，就不是diagonal matrix了，因为每个z都对y由贡献。</p>
+<center><img src="/images/40597329.png" width="50%"></center><br>-   接下来就是求$\frac{\partial z^2 }{\partial a^1}$,同样也是一个Jacobian matrix，偏导就是对应的权重值，整个matrix就是$W^2$:<br><center><img src="/images/40597329.png" width="50%"></center>
+
+<ul>
+<li>求$\frac{\partial z^2 }{\partial W^2}$，$W^2$是一个matrix，结构如下：</li>
+</ul>
+<center><img src="/images/41293078.png" width="39%"></center>
+
+<p>$z^l_i$只与计算该值的$w^{l}_{ij}$相关，如下图，所以最后的结果是一个类diagonal mtrix,值为$a^{l -1}$ :</p>
+<center><img src="/images/41265687.png" width="30%"></center><br>最后我们要求$\frac{\partial C }{\partial W^1}$，就是将路径上的所有偏导乘起来就可以了，注意最后结果的维度, 高度为1，宽度为$m \times n$:<br><center><img src="/images/41620488.png" width="50%"></center>
 
 <p>计算图的结果和采用BP是一致的。计算图貌似只使用Backforward过程，但$a$的计算都需要forward progress处理。</p>
 
