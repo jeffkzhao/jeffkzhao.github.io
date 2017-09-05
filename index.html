@@ -185,10 +185,10 @@ var _hmt = _hmt || [];
 <p>因为神经网络有很多层，那么我们就必须用chain rule一步一步的计算。$L(\theta )$是$l^n$的summation，所以我们只关注单个$l^i$就可以了。<br>先尝试从前往后计算，考虑二维的简单网络，我们求偏导数$\frac{\partial l}{\partial w}$:</p>
 <center><img src="/images/0.5922092281785831.png" width="50%"></center>
 
-<p><strong>$\frac{\partial z}{\partial w}$ 很明显，就是对应的输入值</strong>，那么我们只需要将不同层neurons的输出值计算出来就可以了。<br> 重点在第二部分<strong>$\frac{\partial l}{\partial z}$ </strong>，我们再用一次chain rull：</p>
+<p><strong>$\frac{\partial z}{\partial w}$ 很明显，就是对应的输入值</strong>，那么我们只需要将不同层neurons的输出值计算出来就可以了。<br> 重点在第二部分<strong>$\frac{\partial l}{\partial z}$ </strong>，我们再用一次chain rule：</p>
 <center><img src="/images/0.5575071618765384.png" width="50%"></center>
 
-<p> $\frac{\partial a}{\partial z} = {\sigma}’ (z)$，这个也好计算。接下来我们就要计算$\frac{\partial l}{\partial a}$。这里记住$l$是神经网络最后计算结果$y$的函数，还是需要用chain rull计算偏导数:</p>
+<p> $\frac{\partial a}{\partial z} = {\sigma}’ (z)$，这个也好计算。接下来我们就要计算$\frac{\partial l}{\partial a}$。这里记住$l$是神经网络最后计算结果$y$的函数，还是需要用chain rule计算偏导数:</p>
 <center><img src="/images/0.01608216830616671.png" width="50%"></center><br><center><img src="/images/0.47019990547383617.png" width="39%"></center>
 
 
