@@ -154,6 +154,576 @@ var _hmt = _hmt || [];
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-backPropagation" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/09/05/backPropagation/">2 反向传播</a>
+    </h1>
+  
+
+        
+        <a href="/2017/09/05/backPropagation/" class="archive-article-date">
+  	<time datetime="2017-09-05T02:51:27.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-05</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="BackPropagation"><a href="#BackPropagation" class="headerlink" title="BackPropagation"></a>BackPropagation</h2><p>这部分讲如何高效地计算神经网络中的梯度。</p>
+<h3 id="链式法则"><a href="#链式法则" class="headerlink" title="链式法则"></a>链式法则</h3><p>多元复合函数的求导公式利用了偏导数的<strong>链式法则chain rule</strong>，注意下面偏导数的表示形式。</p>
+<center><img src="/images/0.6454714254497449.png" width="50%"></center>
+
+
+<h3 id="BackPropagation-1"><a href="#BackPropagation-1" class="headerlink" title="BackPropagation"></a>BackPropagation</h3><p>看一下我们要计算的梯度形式，每一个训练样本的损失函数为$l^n$，最终的损失函数$L(\theta )$ 是所有训练样本的summation。目标是求对不同$w$的梯度：</p>
+<center><img src="/images/0.9688997196214963.png" width="66%"></center>
+
+<p>因为神经网络有很多层，那么我们就必须用chain rule一步一步的计算。$L(\theta )$是$l^n$的summation，所以我们只关注单个$l^i$就可以了。<br>先尝试从前往后计算，考虑二维的简单网络，我们求偏导数$\frac{\partial l}{\partial w}$:</p>
+<center><img src="/images/0.5922092281785831.png" width="66%"></center>
+
+<p><strong>$\frac{\partial z}{\partial w}$ 很明显，就是对应的输入值</strong>，那么我们只需要将不同层neurons的输出值计算出来就可以了。<br> 重点在第二部分<strong>$\frac{\partial l}{\partial z}$ </strong>，我们再用一次chain rull：</p>
+<center><img src="/images/0.5575071618765384.png" width="66%"></center>
+
+<p> $\frac{\partial a}{\partial z} = {\sigma}’ (z)$，这个也好计算。接下来我们就要计算$\frac{\partial l}{\partial a}$。这里记住$l$是神经网络最后计算结果$y$的函数，还是需要用chain rull计算偏导数:</p>
+<center><img src="/images/0.01608216830616671.png" width="66%"></center><br><center><img src="/images/0.47019990547383617.png" width="50%"></center>
+
+
+<p> <strong>$\frac{\partial l}{\partial z}$ 是下一层 $\frac{\partial l}{\partial z}$的加权summation</strong>。我们就需要这样递归的一步一步计算下去，直到输出层，才能得到该层的 $\frac{\partial l}{\partial z}$。</p>
+<ul>
+<li>最后一层的 $\frac{\partial l}{\partial z} = \frac{\partial l}{\partial y} \frac{\partial y}{\partial z}$，这两项都是可以直接计算出来的，递归终止。</li>
+</ul>
+<p>很明显， $\frac{\partial l}{\partial z}$依赖于后层的 $\frac{\partial l}{\partial z}$，我们应该从最后一层反过来计算 $\frac{\partial l}{\partial z}$，这样从后往前计算所有的 $\frac{\partial l}{\partial z}$就简单直观多了，这就是<strong>backpropagation</strong>。<br>总结一下，用gradient descent优化神经网络，重点是如何计算梯度$\frac{\partial l}{\partial w}$。使用train rule分解为两部分$\frac{\partial z}{\partial w} \times \frac{\partial l}{\partial z}$ ：前半部分也就是前一层的神经元输出（第一层就是输入值）在forward pass 阶段计算；后一部分从最后一层开始，逐层往前计算$\frac{\partial l}{\partial z}$：</p>
+<center><img src="/images/38156580.png" width="66%"></center>
+
+<p>具体的计算流程如下图，上标表示层，下标单数字表示该层排列号，双数字，如$w^l_{ij}$, $i$表示l层中的排列号，$j$表示前一层$l -1$层的排列号 ：</p>
+<center><img src="/images/38156580.png" width="66%"></center><br><center><img src="/images/38108354.png" width="50%"></center>
+
+<p>稍复杂是在bp中的这个迭代，$\frac{\partial C}{\partial z^l} = \frac{\partial a^l}{\partial z^l} \frac{\partial C}{\partial a^l}  = {\sigma}’ (z^l)\frac{\partial C}{\partial a^l} =  {\sigma}’ (z^l) \frac{\partial z^{l + 1}}{\partial a^l}\frac{\partial C}{\partial z^{l + 1}} = {\sigma}’ (z^l) \left({W^{l + 1}} \right) ^\mathrm{\top} \frac{\partial C}{\partial z^{l + 1}} $. 最后这个组合${W^{l + 1}}^\mathrm{\top} \frac{\partial C}{\partial z^{l + 1}}$实际上就是前面讲到的下一层权重与偏导数的summation，只不过这地方用矩阵乘法的方式计算，转置是因为我们定义的$W$下一层作为横轴，所有要转一下。最后得到的$\frac{\partial C}{\partial z^l}$是一个vector。</p>
+<h3 id="BP的计算图解释"><a href="#BP的计算图解释" class="headerlink" title="BP的计算图解释"></a>BP的计算图解释</h3><p>还可以用计算图的方法解释BP的过程。计算图computational Graph是一种描述function的形式，<strong>node</strong>代表变量(scalar，vector，tensor…), <strong>edge</strong>代表操作，如函数$e = (a+b) \times (b + 1)$用计算图表示：</p>
+<center><img src="/images/38535751.png" width="66%"></center>
+
+<h4 id="全联接网络的计算图表示"><a href="#全联接网络的计算图表示" class="headerlink" title="全联接网络的计算图表示"></a>全联接网络的计算图表示</h4><p>我们以一个两层神经网络为例：</p>
+<center><img src="/images/38608912.png" width="66%"></center>
+
+<p>梯度的BP计算过程我们使用计算图来完成：</p>
+<center><img src="/images/38769187.png" width="66%"></center><br>我们需要从最后一层开始逐层往前计算偏导数。<strong>vector$\boldsymbol{y}$对vector$\boldsymbol{x}$的偏导数是一个Jacobian Matrix，高度是y的维度，宽度是x的维度</strong>。<br>下面还是以MNIST计算为例。<br>-    1 求$\frac{\partial C }{\partial y}$, $C$采用corss entropy，即$C = -log y_r$。由于$C$是一个scalar，所以结果是大小为 $1 \times len(y)$的matrix。$r$是真实值$\hat{y}$中1的位置，该位置$\frac{\partial C }{\partial y_{r = i} }= 0$，其他$\frac{\partial C }{\partial y_i }= 0$:<br><center><img src="/images/39550959.png" width="66%"></center><br>-    2 接着求$\frac{\partial y }{\partial z^2}$。这里激活函数使用sigmod。$\frac{\partial y }{\partial z^2}$结果是一个Jacobian Matrix，由于y就是该层neurons的输出，每个y对应一个neuron，即$y_i = \sigma (z^2_i)$。那么这个matrix只用$i = j$ 处才值，其他地方偏导为0，既是一个diagonal matrix：<br><center><img src="/images/40337673.png" width="66%"></center>
+
+<p>注意若激活函数是softmax，就不是diagonal matrix了，因为每个z都对y由贡献。</p>
+<center><img src="/images/40597329.png" width="66%"></center><br>-    3 接下来就是求$\frac{\partial z^2 }{\partial a^1}$,同样也是一个Jacobian matrix，偏导就是对应的权重值，整个matrix就是$W^2$:<br><center><img src="/images/" width="66%"></center>
+
+<ul>
+<li>4 求$\frac{\partial z^2 }{\partial W^2}$，$W^2$是一个matrix，结构如下：</li>
+</ul>
+<center><img src="/images/41293078.png" width="66%"></center>
+
+<p>$z^l_i$只有计算该值的$w^{l }_{ij}}$相关，如下图，所以最后的结果是一个类diagonal mtrix,值为$a^{l -1}$ :</p>
+<center><img src="/images/41265687.png" width="66%"></center><br>最后我们要求$\frac{\partial C }{\partial W^1}$，就是将路径上的所有偏导乘起来就可以了，注意最后结果的维度, 高度为1，宽度为$m \times n$:<br><center><img src="/images/41620488.png" width="66%"></center>
+
+<p>计算图的结果和采用BP是一致的。计算图貌似只使用Backforward过程，但$a$的计算都需要forward progress处理。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">back-propagation</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/DeepLearning/" class="article-tag-list-link color3">DeepLearning</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/09/05/backPropagation/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-deepLearning" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/09/05/deepLearning/">1 深度前馈网络</a>
+    </h1>
+  
+
+        
+        <a href="/2017/09/05/deepLearning/" class="archive-article-date">
+  	<time datetime="2017-09-05T02:36:58.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-05</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Fully-Connect-Feedforward-Network"><a href="#Fully-Connect-Feedforward-Network" class="headerlink" title="Fully Connect Feedforward Network"></a>Fully Connect Feedforward Network</h2><center><img src="/images/785e5589-fc55-41df-a1c0-6e281bbbafd0/index_files/0.006484606026248452.png" width="66%"></center>
+
+<p>不同的连接方式构成不同的网络结构。 所有的neurons神经节点中的权重$w$和偏置$b$就是<strong>Network parameter $\boldsymbol{\theta}$ </strong>.<br><strong>fully connect</strong>是指全连接：前一层m个neurons与后一层n个neurons都有连接，连接数为$m \times n$。Feedforward：neurons影响下层neurons，而不会返回影响上层节点。</p>
+<center><img src="/images/0.8832343336060013.png" width="66%"></center>
+
+<p><strong>Deep = Many Hidden Layers</strong>:</p>
+<center><img src="/images/0.07262105251509965.png" width="50%"></center>
+
+<h2 id="计算"><a href="#计算" class="headerlink" title="计算"></a>计算</h2><p>一个<strong>神经网络实际上起到是一个函数作用</strong>$\mathbb{R}^m \to \mathbb{R}^n $。输入层进过每一层的计算，最终得到最后的结果。</p>
+<center><img src="/images/26051569.png" width="30%"></center>
+
+<p>计算过程中，会用到大量的矩阵计算。<em>*如果输入层是m维，下一层neurons的个数是n，那么这个矩阵就是$n \times m$矩阵。矩阵是线性变换：列$j$代表对输入$a_j$的线性变换，也就是$a_j$与下一层neurons连接的权重组成。矩阵的行$i$与下一层$z_i$对应：$z_i = \sum w_{i</em>}x_* $。如下图，矩阵是一个$2 \times 2$的矩阵：</p>
+<center><img src="/images/0.8393638459139419.png" width="66%"></center>
+
+<p>当经过所有层的运算，实际上就是一个叠加的过程，可以使用并行计算加速矩阵操作：</p>
+<center><img src="/images/0.7996602206597727.png" width="66%"></center><br>当输出为多类时，我们可以使用Softmax：<br><br><center><img src="/images/0.7128299438078729.png" width="66%"></center><br><center><img src="/images/0.7818871937666141.png" width="66%"></center>
+
+<p>使用神经网络的好处是<strong>特征工程不是那么重要了：DL本身就是一个特征变换的过程，另外经常我们不知道哪个特征更好。</strong>我们需要决定的是网络结构是什么样的：多少层，每层多少个neurons（经验，尝试），激活函数等。网络结构就决定了我们的<strong>function set</strong>, 下一步就是怎么衡量function的好坏。我们还是用<strong>交叉熵</strong>：</p>
+<center><img src="/images/0.04531625826255925.png" width="66%"></center>
+
+<p>和所有的机器学习模型一样，为了找到合适参数组合，最后我们就要<strong>最小化所有训练集上的交叉熵之和</strong>：</p>
+<center><img src="/images/0.17478607669708834.png" width="66%"></center>
+
+<p>这个最优化问题还是采用梯度下降法去求：</p>
+<center><img src="/images/0.9428713003910689.png" width="66%"></center>
+
+<p>这里梯度的计算就是重点，如何高效的求梯度？就要用到BP算法。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">deep-learning</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/DeepLearning/" class="article-tag-list-link color3">DeepLearning</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/09/05/deepLearning/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-mlSystemDesign" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/09/04/mlSystemDesign/">10 机器学习系统设计</a>
+    </h1>
+  
+
+        
+        <a href="/2017/09/04/mlSystemDesign/" class="archive-article-date">
+  	<time datetime="2017-09-04T01:57:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-04</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>如何设计一个机器学习系统?<br>一个好的系统其实需要考虑很多的东西,不单纯是模型的问题:<br>如垃圾邮件系统:</p>
+<ul>
+<li>收集更多的样本</li>
+<li>基于邮件的路由信息开发一系列复杂的特征: 群发邮件</li>
+<li>基于邮件的正文信息开发一系列复杂的特征，包括考虑截词的处理:内容检测</li>
+<li>为探测刻意的拼写错误（把watch写成w4tch）开发复杂的算法 </li>
+</ul>
+<h2 id="误差分析（ERROR-ANALYSIS）"><a href="#误差分析（ERROR-ANALYSIS）" class="headerlink" title="误差分析（ERROR ANALYSIS）"></a>误差分析（ERROR ANALYSIS）</h2><p>误差分析可以帮助我们系统化地选择该做什么.<br>构建一个学习算法的推荐方法为：</p>
+<ul>
+<li>从一个简单的能快速实现的算法开始，实现该算法并用交叉验证集数据测试这个算法.</li>
+<li>绘制学习曲线，决定:<ul>
+<li>增加更多数据: 过拟合/high  variance；</li>
+<li>添加更多特征: 欠拟合/high bias，还是其他选择；</li>
+</ul>
+</li>
+<li>进行误差分析：人工检查交叉验证集中我们算法中产生预测误差的实例，看看这些实例是否有某种系统化的趋势；<ul>
+<li>误差分析可能并不总能帮助我们，我们还需要尝试不同的模型来比较。</li>
+</ul>
+</li>
+</ul>
+<h2 id="类偏斜的误差度量（ERROR-METRICS-FOR-SKEWED-CLASSES）"><a href="#类偏斜的误差度量（ERROR-METRICS-FOR-SKEWED-CLASSES）" class="headerlink" title="类偏斜的误差度量（ERROR METRICS FOR SKEWED CLASSES）"></a>类偏斜的误差度量（ERROR METRICS FOR SKEWED CLASSES）</h2><h3 id="skewed-classes"><a href="#skewed-classes" class="headerlink" title="skewed   classes"></a>skewed   classes</h3><p>positive的实例很少，只用准确率去判断无法正确反映分类器的实例：若negative样本为99%，那么即使把所有样本全部预测为negative，从整体样本来说准确率还可以达到99%!!两个度量:</p>
+<ul>
+<li><strong>准确率Precision</strong>： 预测正确的个数/预测总数；</li>
+<li><strong>覆盖率Recall</strong>：    预测正确的个数/实际样本中的总数；<br>在现实中，根据实际需要，取舍两者的比例。<br>另外，我们可以用<strong>F1值／F1 score</strong> 来自动均衡两者:<br>$$F1 = 2 \times \frac{PR}{p+ R}$$</li>
+</ul>
+<h2 id="机器学习的数据"><a href="#机器学习的数据" class="headerlink" title="机器学习的数据"></a>机器学习的数据</h2><p>回到上面的问题，当效果不好的时候，我们是要增加样本数据，还是考虑修改模型，抑或是换一个模型？<br>也可以这么想：在这些特征面前，一个真人专家是否能有信心地预测结果？<br>若可以，而我们的模型又high variance，代价函数也小，那么就可以考虑增加样本，因为模型过拟合了。过拟合其实说明一点：<strong>该模型能够描绘出特征信息，可以考虑增加样本，减少特征数的方法。</strong><br>若此时<strong>是high bias，那增加样本也无能为力了。</strong></p>
+<p>我们希望我们的算法<strong>低偏倚，低偏差</strong>：</p>
+<ul>
+<li>选择更多的特征来降低偏倚；</li>
+<li>再通过增加数据量来降低偏差。</li>
+</ul>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">machine-learning</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/吴恩达Coursera笔记/" class="article-tag-list-link color4">吴恩达Coursera笔记</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/09/04/mlSystemDesign/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-suggestion" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/09/04/suggestion/">9 机器学习应用建议</a>
+    </h1>
+  
+
+        
+        <a href="/2017/09/04/suggestion/" class="archive-article-date">
+  	<time datetime="2017-09-04T01:11:26.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-04</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="优化选择"><a href="#优化选择" class="headerlink" title="优化选择"></a>优化选择</h2><h3 id="回归模型预测结果很差-怎么办？"><a href="#回归模型预测结果很差-怎么办？" class="headerlink" title="回归模型预测结果很差,怎么办？"></a>回归模型预测结果很差,怎么办？</h3><ul>
+<li>1 获得更多的训练实例;</li>
+<li>2 尝试<strong>减少特征的数量 –减少过拟合;</strong></li>
+<li>3尝试获得<strong>更多的特征–欠拟合，有效的特征数偏少;</strong></li>
+<li>4 尝试<strong>增加二项式特征– 如 $x_1^2,x_2^2, x_1*x_2$ 模型选择问题;</strong></li>
+<li>5 尝试<strong>减少归一化程度$\lambda$ ;   </strong></li>
+<li>6 尝试<strong>增加归一化程度$\lambda$ ;</strong><br>这些办法也不是随机选择的，<strong>需要运用一些分析，帮助你知道问题所在;</strong></li>
+</ul>
+<h2 id="假设评估-evaluating-hypothesis"><a href="#假设评估-evaluating-hypothesis" class="headerlink" title="假设评估 evaluating hypothesis"></a>假设评估 evaluating hypothesis</h2><ul>
+<li><strong>评估训练得到的假设Hypothesis</strong>;</li>
+<li>数据<strong>分成训练集和测试集</strong>，通常用<strong>70%的数据作为训练集，用剩下30%的数据作为测试集</strong>;</li>
+<li>训练集和测试集<strong>均要含有各种类型的数据</strong>;<blockquote>
+<p>   通常要<strong>对数据进行“洗牌”：randomly shuffle，保证数据的均匀分布</strong>，然后再分成训练集和测试集。</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="测试集评估"><a href="#测试集评估" class="headerlink" title="测试集评估"></a>测试集评估</h3><p>对测试集运用该模型，我们有两种方式计算误差：</p>
+<ul>
+<li><strong>对于线性回归模型，我们利用测试集数据计算代价函数J </strong>;</li>
+<li>对于逻辑回归模型，我们除了可以利用测试数据集来计算代价函数外：</li>
+</ul>
+<center><img src="/images/7ee1f4f9-6187-4b11-b7c4-d0efc465d04c.jpg" width="50%"></center>
+
+<p>还可以计算<strong>错误分类的比率</strong>，对于每一个测试集实例，计算：</p>
+<center><img src="/images/f05057f0-0cd6-4605-afbe-26e20e49ff6c.jpg" width="50%"></center>
+
+<h2 id="交叉验证-模型选择"><a href="#交叉验证-模型选择" class="headerlink" title="交叉验证-模型选择"></a>交叉验证-模型选择</h2><ul>
+<li>我们有<strong>多个相类似的模型，如何选择出”最好”的模型？</strong></li>
+<li>假设我们要在10个不同次数的二项式模型之间进行选择：</li>
+</ul>
+<center><img src="/images/60ca9b25-d19a-4677-bca6-2337f604e059.png" width="39%"></center>
+
+<ul>
+<li>越高次数的二项式模型越能够适应我们的训练数据集，但并不代表着能推广至一般情况，我们<strong>应该选择一个更能适应一般情况的模型：泛化。</strong></li>
+</ul>
+<h3 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h3><p>使用<strong>交叉验证集</strong>来帮助选择模型：</p>
+<ul>
+<li>1训练集拆分：<ul>
+<li>使用<strong>60%</strong>的数据作为<strong>训练集</strong>;</li>
+<li>使用<strong>39%</strong>的数据作为<strong>交叉验证集</strong>;</li>
+<li>使用<strong>39%</strong>的数据作为<strong>测试集</strong>;</li>
+</ul>
+</li>
+<li>2  使用训练集训练出10个模型;</li>
+<li>3  用10个模型分别对交叉验证集计算得出交叉验证误差（代价函数的值）;</li>
+<li>4  选取代价函数值最小的模型;</li>
+<li>5  用步骤4中选出的模型对测试集计算得出推广误差（代价函数的值）;</li>
+</ul>
+<h2 id="偏倚和偏差诊断（DIAGNOSIS-BIAS-VS-VARIANCE）"><a href="#偏倚和偏差诊断（DIAGNOSIS-BIAS-VS-VARIANCE）" class="headerlink" title="偏倚和偏差诊断（DIAGNOSIS BIAS VS. VARIANCE）"></a>偏倚和偏差诊断（DIAGNOSIS BIAS VS. VARIANCE）</h2><center><img src="/images/2f356c6c-4351-4317-88b1-98fa7a6377da.jpg" width="80%"></center>
+
+<ul>
+<li><strong>bias: 偏倚</strong>，与实际的线路偏差了-<strong>欠拟合</strong>;</li>
+<li><strong>variance/偏差</strong>：方差，过拟合造成曲线过于频繁上下波动，方差也就大；我们想让曲线更平滑一些，所以说过拟合的情况为high variance。</li>
+</ul>
+<center><img src="/images/169234f5-eabb-4b35-94fb-8c007105606f.jpg" width="39%"></center>
+
+
+<h3 id="诊断"><a href="#诊断" class="headerlink" title="诊断"></a>诊断</h3><p>将训练集和交叉验证集的代价函数误差与多项式的次数绘制在同一张图表上来帮助分析： </p>
+<center><img src="/images/7ce4fa51-4c19-4f42-94d2-b556de200ee4.jpg" width="39%"></center>      
+
+<ul>
+<li>1 d较小时， 训练集和交叉验证集误差近似，且误差均比较大，随着d增加而同时减少;</li>
+<li>2  当d增大时，交叉验证集误差呈现先减小后增大的趋势，<strong>转折点是我们的模型开始过拟合训练数据集的时候。</strong></li>
+<li><p>3  d增大， 训练集误差一直减少，<strong>直到过拟合</strong>;</p>
+</li>
+<li><p><strong>交叉验证集误差较大</strong>，我们如何判断是<strong>偏倚还是偏差呢？</strong></p>
+<ul>
+<li>1 <strong>训练集误差和交叉验证集误差近似时：     bias偏倚/低拟合</strong>;</li>
+<li>2 <strong>交叉验证集误差远大于训练集误差时：     variance偏差/过拟合 </strong>;</li>
+</ul>
+</li>
+</ul>
+<h3 id="归一化与偏倚-偏差"><a href="#归一化与偏倚-偏差" class="headerlink" title="归一化与偏倚/偏差"></a>归一化与偏倚/偏差</h3><p>一般会使用一些归一化方法来防止过拟合。但是我们可能会归一化的程度太高或太小了：</p>
+<center><img src="/images/995c4c63-6f01-4270-b966-224d03d39348.jpg" width="80%"></center>
+
+<p>选择一系列的想要测试的$\lambda$ 值，<strong>通常是0-10之间的呈现2倍关系的值</strong>（如：0,0.01,0.02,0.04,0.08,0.15,0.32,0.64,1.28,2.56,5.12,10共12个）。<br>选择$\lambda$ 的方法为：</p>
+<ul>
+<li>1  使用训练集训练出12个不同程度归一化的模型;</li>
+<li>2  用<strong>12个模型分别对交叉验证集计算的出交叉验证误差</strong>;</li>
+<li>3  <strong>选择得出交叉验证误差最小的模型</strong>;</li>
+<li>4  运用步骤3中选出模型对测试集计算得出推广误差;</li>
+</ul>
+<p>也可以同时将<strong>训练集和交叉验证集模型的代价函数误差与$\lambda$ 的值绘制在一张图表上</strong>.</p>
+<center><img src="/images/a6be07c9-d1e0-4d44-b9ab-e72a918416b2.jpg" width="39%"></center>
+
+<ul>
+<li>当<strong>$\lambda$ 较小时，训练集误差较小（过拟合）</strong> 而交叉验证集误差较大;</li>
+<li>随着<strong>$\lambda$ 的增加，训练集误差不断增加（低拟合），而交叉验证集误差则是先减小后增加</strong>;</li>
+</ul>
+<h3 id="学习曲线（LEARNING-CURVES）"><a href="#学习曲线（LEARNING-CURVES）" class="headerlink" title="学习曲线（LEARNING CURVES）"></a>学习曲线（LEARNING CURVES）</h3><ul>
+<li>学习曲线是将<strong>训练集误差和交叉验证集误差</strong>作为训练集实例数量（m）的函数绘制的图表。<ul>
+<li>当训练较少行数据的时候，<strong>训练的模型将能够非常完美地适应较少的训练数据</strong>，但是<strong>训练出来的模型却不能很好地适应交叉验证集数据或测试集数据。</strong></li>
+</ul>
+</li>
+</ul>
+<center><img src="/images/73be659c-bbef-4ee6-9ea8-0e6a40faede3.jpg" width="39%"></center>
+
+<h4 id="用学习曲线识别低拟合-高偏倚"><a href="#用学习曲线识别低拟合-高偏倚" class="headerlink" title="用学习曲线识别低拟合/高偏倚"></a>用学习曲线识别低拟合/高偏倚</h4><ul>
+<li>尝试用一条直线来适应下面的数据，可以看出，<strong>无论训练集有多么大误差还是很大：</strong></li>
+<li>说明：  <strong>欠拟合/high bias高偏倚 情况下， 训练集再大，也没有用</strong> .</li>
+</ul>
+<center><img src="/images/2863c8c3-1701-482a-a852-5049fee9de01.jpg" width="70%"></center>
+
+<h4 id="用学习曲线识别过拟合-高偏差"><a href="#用学习曲线识别过拟合-高偏差" class="headerlink" title="用学习曲线识别过拟合/高偏差"></a>用学习曲线识别过拟合/高偏差</h4><ul>
+<li><strong>当交叉验证集误差远大于训练集误差时(过拟合)</strong>: 往训练集增加更多数据可以提高模型的效果。  </li>
+<li>过拟合：<strong>拟合少部分数据，当训练集足够大时，能够更好的泛化数据。</strong></li>
+</ul>
+<p><center><img src="/images/d0a6b497-d707-4d44-99b8-d3129132cbec.jpg" width="70%"></center></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><h3 id="解决过拟合-高偏差"><a href="#解决过拟合-高偏差" class="headerlink" title="解决过拟合-高偏差"></a>解决过拟合-高偏差</h3><ul>
+<li><strong>1  获得更多的训练实例</strong>;</li>
+<li><strong>2  尝试减少特征的数量</strong>;</li>
+<li><strong>3  尝试增加归一化程度$\lambda$ </strong>;</li>
+</ul>
+<h3 id="解决欠拟合-高偏倚"><a href="#解决欠拟合-高偏倚" class="headerlink" title="解决欠拟合-高偏倚"></a>解决欠拟合-高偏倚</h3><ul>
+<li><strong>4  尝试获得更多的特征</strong>;</li>
+<li><strong>5  尝试更复杂的模型–如增加二项式特征</strong>;</li>
+<li><strong>6  尝试减少归一化程度$\lambda$ </strong>;</li>
+</ul>
+<h3 id="神经网络的偏倚-偏差"><a href="#神经网络的偏倚-偏差" class="headerlink" title="神经网络的偏倚/偏差"></a>神经网络的偏倚/偏差</h3><ul>
+<li>使用<strong>较小</strong>的神经网络，类似于<strong>参数较少的情况，容易导致高偏倚/低拟合，但计算代价较小</strong>;</li>
+<li>使用<strong>较大</strong>的神经网络，类似于<strong>参数较多的情况，容易导致高偏差/过拟合，虽然计算代价比较大，但是可以通过归一化手段来调整而更加适应数据。</strong>;</li>
+<li><p><strong>通常选择较大的神经网络并采用归一化处理会比采用较小的神经网络效果要好。</strong>;</p>
+</li>
+<li><p>对于神经网络中的隐藏层的层数的选择，<strong>通常从一层开始逐渐增加层数</strong>，为了更好地作选择，可以<strong>把数据分为训练集、交叉验证集和测试集</strong>，针对不同隐藏层层数的神经网络训练神经网络，然后选择交叉验证集代价最小的神经网络。</p>
+</li>
+</ul>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">machine-learning</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/吴恩达Coursera笔记/" class="article-tag-list-link color4">吴恩达Coursera笔记</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/09/04/suggestion/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-regularization" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -946,495 +1516,10 @@ var _hmt = _hmt || [];
 
 
   
-    <article id="post-linearRegressionWithOneVariable" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/08/30/linearRegressionWithOneVariable/">2 单变量线性回归</a>
-    </h1>
-  
-
-        
-        <a href="/2017/08/30/linearRegressionWithOneVariable/" class="archive-article-date">
-  	<time datetime="2017-08-30T04:58:21.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-30</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="单变量线性回归-linear-regression-with-one-variable"><a href="#单变量线性回归-linear-regression-with-one-variable" class="headerlink" title="单变量线性回归 linear regression with one variable"></a>单变量线性回归 linear regression with one variable</h2><h2 id="房价预测："><a href="#房价预测：" class="headerlink" title="房价预测："></a>房价预测：</h2><p><img src="/images/ca89df56-cb79-42be-be36-aa8dedad64e2.png" width="50%"><br><img src="/images/f1b93a76-26e9-4d14-89d0-8abc3ba57e15.png" width="50%"></p>
-<h2 id="问题描述："><a href="#问题描述：" class="headerlink" title="问题描述："></a>问题描述：</h2><ul>
-<li>$m $             代表训练集中实例的数量</li>
-<li>$x  $             代表特征/输入变量</li>
-<li>$y   $            代表目标变量/输出变量</li>
-<li>$(\boldsymbol{x,y})    $         代表训练集中的实例</li>
-<li>$ (x^{(i)},y^{(i)})   $    代表第i个观察实例</li>
-<li>$h $              代表学习<strong>算法的解决方案或函数也称为假设（hypothesis）:</strong></li>
-</ul>
-<p><img src="/images/809cc2dc-53ec-40f8-8c3f-985c3d8baf4b.jpg" width="50%"></p>
-<ul>
-<li><strong>由训练集通过学习算法，学习得到一个假设$h$（这个假设就是一个模型），新的数据通过h，预测出房价。</strong></li>
-</ul>
-<ul>
-<li><p>如何表达$h$？这个例子中，我们先用一个线性方程：<br>$$h_{\theta}=\theta_0 + \theta_1 x$$</p>
-</li>
-<li><p>因为只含有一个特征/输入变量，因此这样的问题叫作<strong>单变量线性回归问题.</strong></p>
-<ul>
-<li><strong>线性关系（Linearity）</strong>是变量与自变量成一次方的函数关系。其画在函数图上会呈现一条直线。</li>
-</ul>
-</li>
-</ul>
-<h3 id="代价函数cost-function"><a href="#代价函数cost-function" class="headerlink" title="代价函数cost function"></a>代价函数cost function</h3><ul>
-<li>确定了$h$的形式，我们就<strong>要为模型选择合适的参数parameters ：  $\theta_0, \theta_1$。</strong></li>
-<li>预测值与实际值的差距就是<strong>建模误差modeling error</strong></li>
-<li>我们选择的建模<strong>误差的平方和( square error function)</strong>作为模型的代价函数，<strong>目标就是选择使得代价函数最小的模型参数。</strong></li>
-</ul>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
-<li>Hypothesis：          $h_{\theta}=\theta_0 + \theta_1 x$</li>
-<li>Parameters:             $\theta_0, \theta_1$</li>
-<li>Cost function:        其中$m$为样本个数 </li>
-</ul>
-<p><img src="/images/rt56789hljkfl.png" width="30%"></p>
-<ul>
-<li>Goal :                           <strong>最小化代价函数</strong></li>
-</ul>
-<p><img src="/images/92b056b4-46bb-444a-b1e4-b468539f2e30.png" width="30%"></p>
-<ul>
-<li>下面的等高图，三个坐标分别为 $\theta_0, \theta_1, J(\theta_0, \theta_1)$：我们就是要<strong>找到那个凹点，使得$ J(\theta_0, \theta_1)$值最小。</strong></li>
-</ul>
-<p><img src="/images/83799220-aef8-45d2-9da7-a81551866aec.jpg" width="30%"></p>
-<ul>
-<li>如何找？下面介绍一种方法来求解代价函数的最小值。</li>
-</ul>
-<h2 id="梯度下降Gradient-descent"><a href="#梯度下降Gradient-descent" class="headerlink" title="梯度下降Gradient descent"></a>梯度下降Gradient descent</h2><ul>
-<li>思想：初始化参数（<strong>随机</strong>找一个参数组合 $\theta_0, \theta_1, … \theta_n$, <strong>目标是寻找下一个能让代价函数值下降最多的参数组合</strong>，持续这么做直到一个<strong>局部最小值（local minimum）</strong>。</li>
-<li>因为<strong>没有试过所有的参数组合，所以不能确认局部最小值是否是全局最小值（global minimum）</strong></li>
-<li><strong>选择不同的初始参数组合，可能会找到不同的局部最小值</strong>。下图显示使用不同的初始值到达的不同的local minimum：</li>
-</ul>
-<p><img src="/images/fb1cd24f-bc77-41a2-a8a9-d86217b655a8.jpg" width="50%"></p>
-<h4 id="Gradient-descent-algorithm"><a href="#Gradient-descent-algorithm" class="headerlink" title="Gradient descent algorithm"></a>Gradient descent algorithm</h4><ul>
-<li><strong>沿下降最快的方向（导数）梯度下降(参数必须同步更新)，下降率由learning Rate控制</strong>：<ul>
-<li>下降速度最快的方向为什么是导数方向：直观的例子，在一个下坡路，找一条离坡地最近的路：当然是沿着坡道直下（导数方向）而不是走Z字行下：上坡为省力选择Z字小坡度上，但是距离也更长；上图也可以想象为一个山脉，你想找到一条离山谷最近的路，当然是走最陡峭的路最近（这是一种贪婪算法，不一定是最优），最陡峭也就是导数方向(曲面的导数）。</li>
-</ul>
-</li>
-</ul>
-<p><img src="/images/6b2dd992-af3e-4232-bd63-c9ff55dd4512.png" width="50%"></p>
-<blockquote>
-<p>   为什么是减去？下图分为了左右两部分下降：左边部分因为导数是负数，减的话就成加了：</p>
-</blockquote>
-<p><img src="/images/e042649f-cbba-4414-ba13-57a118833e83.png" width="50%"></p>
-<ul>
-<li><strong>这样每个参数都是在它的导数即下降最快的方向下降。</strong></li>
-</ul>
-<p><img src="/images/97f44e47-64ff-4458-814e-664f5a89f4f9.jpg" width="30%"></p>
-<h3 id="学习率-α"><a href="#学习率-α" class="headerlink" title="学习率 α"></a>学习率 α</h3><ul>
-<li><strong>太小，学习太慢</strong></li>
-<li>太大，可能错过最优点：<strong>fail to converge or even diverge</strong></li>
-</ul>
-<p><img src="/images/cd485731-42a0-4301-8585-d696b6390f63.png" width="50%"></p>
-<ul>
-<li>即使固定α，因为随着导数变小，后面的step也会逐渐变小的，所以也能够converge：</li>
-</ul>
-<p><img src="/images/9ab35c38-a546-48c2-a1e2-615257568646.png" width="50%"></p>
-<h3 id="收敛的标准"><a href="#收敛的标准" class="headerlink" title="收敛的标准"></a>收敛的标准</h3><ul>
-<li>最好当然是变化为0 </li>
-<li><strong>$J(\boldsymbol{\theta}) 变化不超过过1/1000,我们就认为converge了</strong></li>
-</ul>
-<h3 id="批量梯度下降（batch-gradient-descent）"><a href="#批量梯度下降（batch-gradient-descent）" class="headerlink" title="批量梯度下降（batch gradient descent）"></a>批量梯度下降（batch gradient descent）</h3><ul>
-<li><strong>batch： 每次都用到所有的training data</strong><br>对于前面的线性回归问题，运用batch gradient descent方法，<strong>关键是求出代价函数的导数</strong>，首先回顾一下模型：</li>
-</ul>
-<p><img src="/images/8d3c13c6-7ab3-4f5c-8c2b-4d3534b04ddd.png" width="50%"></p>
-<ul>
-<li>计算两个参数的倒数：</li>
-</ul>
-<p><img src="/images/b442bae1-c40e-45c6-8eca-dc809822ffb1.png" width="50%"></p>
-<ul>
-<li>这样我们将梯度下降公式做一下替换：</li>
-</ul>
-<p><img src="/images/d7807fa0-5e8c-415f-beb2-314ea76afc10.png" width="50%"></p>
-<p><img src="/images/68702f1d-1ab5-42a3-a085-0956555bcdbf.png" width="50%"></p>
-<h3 id="References"><a href="#References" class="headerlink" title="References"></a>References</h3><ul>
-<li>吴恩达，《Machine learning》，Coursera.</li>
-</ul>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">machine-learning</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">linear-regression</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">gradient-descent</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/吴恩达Coursera笔记/" class="article-tag-list-link color4">吴恩达Coursera笔记</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/08/30/linearRegressionWithOneVariable/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-machineLearning" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/08/30/machineLearning/">1 机器学习概述</a>
-    </h1>
-  
-
-        
-        <a href="/2017/08/30/machineLearning/" class="archive-article-date">
-  	<time datetime="2017-08-30T01:33:12.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-30</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <ul>
-<li><strong>机器学习: 从数据中学到知识。</strong></li>
-<li><p>Computer program is said to learn from experience E with respect to some task T and some performance measure P, if its performance on T, as measured by P improves with experience E.     from Tom Mitchell,1998.</p>
-<ul>
-<li>T: 任务；    P: performance measure    E: experience经验，实验</li>
-</ul>
-</li>
-<li><p><strong>基于E的不断学习，通过P的指标得出在T上的表现得到改进，我们就说程序通过经验E来学习该任务。</strong></p>
-</li>
-<li>如预计房价：</li>
-</ul>
-<p><img src="/images/371a36d9-5739-4c24-9c8d-a268cd21a603.png" width="50%"></p>
-<ul>
-<li>最简单的方法就是用一根直线(也就是一次方程)来预测，用二次函数能够得到更好的结果：</li>
-</ul>
-<p><img src="/images/2dba4dfe-34e3-41e9-8e54-54be4c594a55.png" width="50%"><br>    这种学习称为 <strong>监督学习 supervised learning</strong>: 预先有正确的结果，可以用来指导，检验算法的正确性。</p>
-<h3 id="监督学习-supervised-learning"><a href="#监督学习-supervised-learning" class="headerlink" title="监督学习 supervised learning"></a>监督学习 supervised learning</h3><ul>
-<li><strong>1 回归regression    ：    连续值预测</strong></li>
-<li><strong>2 分类classification：    离散值预测，如何根据特征将对象分到不同的分类中(赋予不同的离散值)</strong></li>
-</ul>
-<p><img src="/images/a1de1ac4-cd04-4deb-8332-9d4d34cf6303.png" width="50%"></p>
-<pre><code>- 上面的例子只用到两个特征 features，更多的特征处理可能需要其他算法，如SVM。
-</code></pre><h3 id="非监督学习-unsupervised-learning"><a href="#非监督学习-unsupervised-learning" class="headerlink" title="非监督学习 unsupervised learning"></a>非监督学习 unsupervised learning</h3><ul>
-<li>特点：<strong>训练数据只有特征，没有结果</strong>：发现这些数据是否可以分为不同的组,应用包括：<ul>
-<li>聚类问题Clustering</li>
-<li>声音辨别：将不同人的声音分离，使用双麦克，位置的远近，角度会造成声音的大小等不同。使用svd一行代码就能解决。</li>
-</ul>
-</li>
-</ul>
-<h3 id="References"><a href="#References" class="headerlink" title="References"></a>References</h3><ul>
-<li>吴恩达，《Machine learning》，Coursera.</li>
-</ul>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/吴恩达Coursera笔记/" class="article-tag-list-link color4">吴恩达Coursera笔记</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/08/30/machineLearning/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-whyDescent" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/08/20/whyDescent/">为什么梯度反方向下降最快？</a>
-    </h1>
-  
-
-        
-        <a href="/2017/08/20/whyDescent/" class="archive-article-date">
-  	<time datetime="2017-08-20T10:21:51.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-20</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>梯度下降算法中，为什么沿着梯度反方向是下降最快呢？用一种直观的方法”证明”一下。考虑两个features的情况。首先用泰勒一阶展开，问题转换为在点(a,b)附近（我们可以限制在以点为圆心的圆内）哪个方向可以使得函数值最小？<br><img src="/images/56631854.png" width="50%"></p>
-<p>转换成一个更好理解的公式：<br><img src="/images/56714381.png" width="50%"><br><strong>看一下公式的后两项，就是两个向量的点积，$[u,v]^ \top$是已知的，要使点积值最小（这里负值是最小的了），当然是和$[u,v]^ \top$方向相反，并且尽可能远的向量了：</strong><br><img src="/images/56935563.png" width="50%"></p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li>李宏毅，《machine learning》</li>
-</ul>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">梯度下降</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/machine-learning/" class="article-tag-list-link color2">machine-learning</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/08/20/whyDescent/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-numCalculate01" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/08/19/numCalculate01/">数值计算需要注意的问题</a>
-    </h1>
-  
-
-        
-        <a href="/2017/08/19/numCalculate01/" class="archive-article-date">
-  	<time datetime="2017-08-19T01:56:55.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-19</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>数值计算中，需要考虑计算机精度带来的一些问题。</p>
-<h2 id="Overflow-and-Underflow上溢和下溢"><a href="#Overflow-and-Underflow上溢和下溢" class="headerlink" title="Overflow and Underflow上溢和下溢"></a>Overflow and Underflow上溢和下溢</h2><p>数字计算机无法对实数进行”精确”表示,总会引入些误差（大部分是<strong>舍入误差rounding errors</strong>）。当这些误差被复合累积操作时，会造成一些问题。</p>
-<p>误差的<strong>下溢</strong> ： 接近零的的数被四舍五入为零。很多时候等于零与接近零的表现质的不同。<br><strong>上溢</strong>：当大量级的数被近似为$\infty, -\infty$,进一步计算会导致非数字。<br>例如softmax函数，经常用于预测与multinoulli 分布相关联的概率，定义为：<br><img src="/images/53235938.png" width="50%"></p>
-<p>考虑所有$x$都等于$c$，那么softmax的理论值为$\frac{1}{n}$。但是在数值计算中，当$c$量级很大时，可能求不到：</p>
-<ul>
-<li>If $c$ is very negative, $\exp (c)$会underflow：造成分母为0。</li>
-<li>$c$是一个很大数，造成$\exp (c)$overflow；</li>
-</ul>
-<p>我们可以通过计算$\mathrm{softmax} (\boldsymbol{z})$来避免这些问题，其中 $\boldsymbol{z = x} - \max _i x_i$ :</p>
-<ul>
-<li>减去$\max _i x_i$导致exp最大参数为0；不会overflow；</li>
-<li>同样的原因，分布至少有一个值为1，排除分母underflow变成被0除的可能。</li>
-</ul>
-<p>另外分子的underflow可导致整体结果为零。若在计算$log (softmax(x))$ 函数中，先计算softmax，再代入计算log有可能出现负无穷结果。所以我们要实现一个单独的函数以数值稳定的方式来计算。</p>
-<p><strong>所以计算时一定要考虑数值不稳定的问题，必须设计为最小化舍入误差的积累</strong>。</p>
-<h2 id="病态条件数Poor-Conditioning"><a href="#病态条件数Poor-Conditioning" class="headerlink" title="病态条件数Poor Conditioning"></a>病态条件数Poor Conditioning</h2><p><strong>条件数conditioning是指函数相对于输入的微小变化而变化的快慢程度</strong>，而迅速变化的函数是不理想的：舍入误差会造成很大的变化。</p>
-<p>考虑函数$f(x) = A^{-1} x$, 当$A \in \mathbb{R}^{n \times n}$具有特征分解时，其条件数为：<br>$$\underset{i,j}{\max}~ \Bigg| \frac{\lambda_i}{ \lambda_j} \Bigg|.$$<br>这是最大和最小特征值的模之比,当该数很大时，矩阵求逆对输入的误差特别敏感。<br>注意这种敏感性是矩阵本身的固有特性，而不是矩阵求逆期间舍入误差的结果。 即使我们乘以完全正确的矩阵逆，病态条件的矩阵也会放大预先存在的误差。 在实践中，该错误将与求逆过程本身的数值误差进一步复合。</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">数值计算</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">overflow & underflow</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">poor conditioning</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/math/" class="article-tag-list-link color5">math</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/08/19/numCalculate01/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
+    <nav id="page-nav">
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
+    </nav>
   
 
 
@@ -1549,11 +1634,23 @@ MathJax.Hub.Queue(function() {
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">back-propagation</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">machine-learning</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">classification</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">deep-learning</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">gradient-descent</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1570,10 +1667,6 @@ MathJax.Hub.Queue(function() {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">poor conditioning</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">gradient-descent</a>
               </li>
              
               <li class="article-tag-list-item">
